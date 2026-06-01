@@ -1,0 +1,27 @@
+{
+  "name": "Nasze Wózki — STILL MES",
+  "short_name": "Nasze Wózki",
+  "description": "System zarządzania renowacją wózków widłowych STILL",
+  "start_url": "/Still/",
+  "scope": "/Still/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0A0A0A",
+  "theme_color": "#FF6B00",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%23FF6B00'/><text x='50%' y='58%' font-family='Arial Black,sans-serif' font-size='90' font-weight='900' fill='black' text-anchor='middle' dominant-baseline='middle'>NW</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='80' fill='%23FF6B00'/><text x='50%' y='58%' font-family='Arial Black,sans-serif' font-size='240' font-weight='900' fill='black' text-anchor='middle' dominant-baseline='middle'>NW</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity"],
+  "lang": "pl"
+}
