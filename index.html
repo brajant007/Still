@@ -1,0 +1,2561 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Nasze Wózki">
+<meta name="theme-color" content="#FF6B00">
+<link rel="manifest" href="manifest.json">
+<title>Nasze Wózki — STILL MES</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black:#0A0A0A; --graphite:#131314; --panel:#1A1A1C; --card:#1E1E21;
+  --border:#2A2A2E; --border2:#333338;
+  --orange:#FF6B00; --ob:rgba(255,107,0,.1); --ob2:rgba(255,107,0,.06);
+  --silver:#A8A8B3; --silver2:#6E6E7A; --white:#F0F0F5;
+  --red:#E8334A; --rb:rgba(232,51,74,.1);
+  --green:#22C55E; --gb:rgba(34,197,94,.1);
+  --blue:#3B82F6; --bb:rgba(59,130,246,.1);
+  --gold:#F59E0B; --goldb:rgba(245,158,11,.1);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--black);color:var(--white);font-family:'Barlow',sans-serif;font-size:14px;overscroll-behavior:none;}
+::-webkit-scrollbar{width:2px;height:2px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+/* ── SCREENS ── */
+#app{position:fixed;inset:0;display:flex;flex-direction:column;}
+
+/* ── LOGIN ── */
+#screen-login{position:fixed;inset:0;background:var(--black);z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow-y:auto;}
+.login-logo{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:36px;letter-spacing:.04em;text-align:center;margin-bottom:4px;}
+.login-logo b{color:var(--orange);}
+.login-sub{font-size:11px;color:var(--silver2);letter-spacing:.12em;text-align:center;margin-bottom:32px;font-family:'Barlow Condensed',sans-serif;}
+.login-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:360px;}
+.login-tile{background:var(--card);border:2px solid var(--border);border-radius:16px;padding:16px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;transition:.15s;user-select:none;}
+.login-tile:active{transform:scale(.95);}
+.login-tile.admin{border-color:rgba(255,107,0,.4);background:var(--ob2);}
+.tile-av{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:22px;color:#fff;}
+.tile-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;text-align:center;line-height:1.2;}
+.tile-role{font-size:10px;color:var(--silver2);text-align:center;margin-top:1px;}
+
+/* ── PIN BOX ── */
+.pin-wrap{width:100%;max-width:290px;margin-top:8px;}
+.pin-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px 16px;text-align:center;}
+.pin-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:18px;margin-bottom:3px;}
+.pin-sub{font-size:11px;color:var(--silver2);margin-bottom:18px;}
+.pin-dots{display:flex;gap:14px;justify-content:center;margin-bottom:20px;}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border2);transition:.12s;}
+.pin-dot.on{background:var(--orange);border-color:var(--orange);}
+.pin-dot.err{background:var(--red);border-color:var(--red);animation:sh .3s ease;}
+@keyframes sh{0%,100%{transform:translateX(0);}25%{transform:translateX(-5px);}75%{transform:translateX(5px);}}
+.pin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.pin-key{height:54px;background:var(--panel);border:1px solid var(--border);border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:22px;color:var(--white);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;user-select:none;transition:.1s;}
+.pin-key sub{font-size:8px;color:var(--silver2);font-weight:600;letter-spacing:.1em;}
+.pin-key:active{background:var(--border2);transform:scale(.9);}
+.pin-key.orange{background:var(--orange);color:#000;border-color:var(--orange);}
+.pin-key.del{background:var(--graphite);}
+.pin-hint{font-size:11px;color:var(--silver2);margin-top:10px;}
+.pin-back{width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:var(--silver);cursor:pointer;margin-top:8px;transition:.12s;}
+.pin-back:active{background:var(--border);}
+
+/* ── TOPBAR ── */
+.topbar{background:var(--graphite);border-bottom:1px solid var(--border);height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;flex-shrink:0;}
+.topbar-left{display:flex;align-items:center;gap:8px;}
+.logo-sq{width:30px;height:30px;background:var(--orange);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:13px;color:#000;}
+.logo-txt{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:17px;}
+.logo-txt b{color:var(--orange);}
+.topbar-right{display:flex;gap:6px;align-items:center;}
+.wchip{display:flex;align-items:center;gap:5px;border-radius:7px;padding:4px 8px 4px 5px;cursor:pointer;border:1px solid transparent;transition:.12s;}
+.wchip-dot{width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:10px;color:#fff;}
+.wchip-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;max-width:65px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.icon-btn{background:var(--card);border:1px solid var(--border);border-radius:7px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--silver);transition:.12s;}
+.icon-btn:active{transform:scale(.88);}
+.active-pill{display:none;background:var(--ob);border:1px solid rgba(255,107,0,.4);border-radius:6px;padding:2px 8px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;color:var(--orange);}
+
+/* ── BOTTOM NAV ── */
+.bnav{background:var(--graphite);border-top:1px solid var(--border);display:flex;height:56px;flex-shrink:0;padding-bottom:env(safe-area-inset-bottom,0);}
+.bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;color:var(--silver2);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:10px;letter-spacing:.06em;border:none;background:none;transition:color .15s;}
+.bnav-btn.on{color:var(--orange);}
+.bnav-icon{width:20px;height:20px;}
+
+/* ── CONTENT ── */
+.content{flex:1;overflow:hidden;position:relative;}
+.view{position:absolute;inset:0;overflow-y:auto;display:none;}
+.view.active{display:block;}
+
+/* ── FAB ── */
+.fab{position:fixed;bottom:calc(64px + env(safe-area-inset-bottom,0));right:14px;width:52px;height:52px;background:var(--orange);border-radius:50%;border:none;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(255,107,0,.5);z-index:60;transition:.15s;}
+.fab:active{transform:scale(.88);}
+
+/* ── MOJE VIEW ── */
+.moje-header{padding:12px 12px 8px;}
+.moje-greeting{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:24px;}
+.moje-greeting span{color:var(--orange);}
+.moje-role{font-size:12px;color:var(--silver2);margin-top:1px;}
+.moje-stats{display:flex;gap:6px;margin-top:10px;}
+.moje-stat{flex:1;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px;text-align:center;}
+.ms-val{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:20px;color:var(--orange);}
+.ms-lbl{font-size:9px;color:var(--silver2);font-family:'Barlow Condensed',sans-serif;font-weight:600;letter-spacing:.06em;margin-top:1px;}
+.section-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:11px;letter-spacing:.1em;color:var(--silver2);text-transform:uppercase;padding:10px 12px 5px;}
+
+/* ── TASK CARD (MOJE) ── */
+.task-card{margin:0 8px 4px;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:.12s;}
+.task-card.running{border-color:rgba(255,107,0,.5);background:var(--ob2);}
+.task-card.urgent{border-color:rgba(232,51,74,.5);}
+.tc-row{display:flex;align-items:center;gap:10px;padding:10px 12px;}
+.tc-cb{width:22px;height:22px;border-radius:5px;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;transition:.12s;}
+.tc-cb.checked{background:var(--orange);border-color:var(--orange);}
+.tc-cb svg{display:none;}
+.tc-cb.checked svg{display:block;}
+.tc-info{flex:1;min-width:0;}
+.tc-op{font-weight:600;font-size:14px;line-height:1.2;}
+.tc-wozek{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;color:var(--orange);margin-top:2px;}
+.tc-meta{font-size:11px;color:var(--silver2);margin-top:1px;}
+.tc-status{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:13px;flex-shrink:0;}
+
+/* ── SERIAL ACTION BAR ── */
+.serial-bar{position:sticky;bottom:0;background:var(--graphite);border-top:1px solid var(--border);padding:10px 12px;display:none;}
+.serial-bar.show{display:block;}
+.serial-bar-inner{display:flex;gap:8px;}
+.serial-info{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;color:var(--silver2);margin-bottom:6px;}
+
+/* ── WÓZEK CARD (HALA/LISTA) ── */
+.wcard{background:var(--card);border:1px solid var(--border);border-radius:10px;margin:0 8px 5px;overflow:hidden;cursor:pointer;transition:border-color .12s;}
+.wcard.urgent{border-color:rgba(232,51,74,.5);}
+.wcard.crisis{border-color:var(--red);}
+.wcard.mine{border-color:rgba(59,130,246,.5);}
+.wcard:active{opacity:.85;}
+.wc-top{display:flex;align-items:center;gap:8px;padding:8px 10px 5px;}
+.wc-photo{width:50px;height:38px;border-radius:6px;object-fit:cover;flex-shrink:0;}
+.wc-photo-ph{width:50px;height:38px;border-radius:6px;background:var(--panel);display:flex;align-items:center;justify-content:center;border:1px dashed var(--border);flex-shrink:0;}
+.wc-info{flex:1;min-width:0;}
+.wc-r1{display:flex;align-items:center;gap:5px;margin-bottom:2px;}
+.wc-vin{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:14px;color:var(--orange);letter-spacing:.04em;}
+.wc-model{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:12px;color:var(--silver);}
+.wc-r2{display:flex;gap:3px;flex-wrap:wrap;}
+.badge{display:inline-flex;align-items:center;border-radius:4px;padding:1px 5px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:10px;letter-spacing:.04em;white-space:nowrap;}
+.b-silver{background:rgba(168,168,179,.12);color:var(--silver);border:1px solid rgba(168,168,179,.25);}
+.b-bronze{background:rgba(180,100,40,.15);color:#CD7F32;border:1px solid rgba(180,100,40,.35);}
+.b-urgent{background:var(--rb);color:var(--red);border:1px solid rgba(232,51,74,.4);}
+.b-crisis{background:rgba(232,51,74,.18);color:var(--red);border:1px solid rgba(232,51,74,.45);}
+.b-mine{background:var(--bb);color:var(--blue);border:1px solid rgba(59,130,246,.35);}
+.b-etap{border:1px solid;}
+.wc-prog{padding:0 10px 5px;}
+.prog-meta{display:flex;justify-content:space-between;margin-bottom:2px;}
+.prog-lbl{font-size:10px;color:var(--silver2);font-family:'Barlow Condensed',sans-serif;font-weight:600;}
+.prog-pct{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;color:var(--orange);}
+.prog-pct.done{color:var(--green);}
+.prog-track{background:var(--panel);border-radius:3px;height:5px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--orange),#FF8C33);transition:width .4s;}
+.prog-fill.done{background:linear-gradient(90deg,var(--green),#4ade80);}
+.wc-workers{display:flex;gap:3px;padding:0 10px 6px;flex-wrap:wrap;align-items:center;}
+.wchip-sm{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:1px 5px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:10px;color:var(--silver);}
+.wchip-sm.on{background:var(--ob);border-color:rgba(255,107,0,.4);color:var(--orange);}
+.wc-actions{display:flex;gap:4px;padding:0 10px 8px;flex-wrap:wrap;}
+.wc-btn{border:none;border-radius:6px;padding:4px 9px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:10px;cursor:pointer;transition:.12s;white-space:nowrap;}
+.wc-btn:active{transform:scale(.9);}
+
+/* ── KANBAN ── */
+.kanban-wrap{display:flex;overflow-x:auto;height:100%;gap:0;padding:8px 0;}
+.kanban-wrap::-webkit-scrollbar{height:3px;}
+.k-col{flex-shrink:0;width:210px;display:flex;flex-direction:column;border-right:1px solid var(--border);}
+.k-col:last-child{border-right:none;}
+.k-hdr{padding:8px 10px 6px;flex-shrink:0;border-bottom:1px solid var(--border);}
+.k-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:12px;letter-spacing:.08em;}
+.k-count{font-size:10px;color:var(--silver2);margin-top:1px;}
+.k-body{flex:1;overflow-y:auto;padding:5px 6px;}
+.k-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 9px;margin-bottom:4px;cursor:pointer;transition:.12s;}
+.k-card:active{opacity:.8;}
+.k-card.urgent{border-color:rgba(232,51,74,.5);}
+.k-card.crisis{border-color:var(--red);}
+.k-vin{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:12px;color:var(--orange);}
+.k-model{font-size:10px;color:var(--silver2);margin-top:1px;}
+.k-prog-track{background:var(--panel);border-radius:2px;height:3px;overflow:hidden;margin-top:5px;}
+.k-prog-fill{height:100%;border-radius:2px;background:var(--orange);transition:width .3s;}
+.k-prog-fill.done{background:var(--green);}
+.k-chips{display:flex;gap:2px;margin-top:4px;flex-wrap:wrap;}
+.k-chip{background:var(--ob);border-radius:3px;padding:1px 4px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:9px;color:var(--orange);}
+
+/* ── LISTA ── */
+.filter-bar{display:flex;background:var(--graphite);border-bottom:2px solid var(--border);flex-shrink:0;position:sticky;top:0;z-index:5;}
+.ftab{flex:1;padding:8px 2px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;letter-spacing:.07em;color:var(--silver2);cursor:pointer;border-bottom:3px solid transparent;transition:.15s;user-select:none;}
+.ftab.on{color:var(--orange);border-bottom-color:var(--orange);background:var(--ob2);}
+.fc{display:inline-flex;align-items:center;justify-content:center;background:var(--border);color:var(--silver);border-radius:9px;font-size:9px;font-weight:700;padding:0 4px;margin-left:2px;min-width:14px;}
+.ftab.on .fc{background:var(--orange);color:#000;}
+.search-wrap{padding:5px 10px;background:var(--graphite);border-bottom:1px solid var(--border);display:flex;gap:6px;align-items:center;flex-shrink:0;position:sticky;top:38px;z-index:5;}
+.search-inp{flex:1;background:none;border:none;outline:none;color:var(--white);font-family:'Barlow',sans-serif;font-size:13px;}
+.search-inp::placeholder{color:var(--silver2);}
+
+/* ── KARTA WÓZKA (detail) ── */
+#screen-detail{position:fixed;inset:0;background:var(--black);z-index:200;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;}
+#screen-detail.open{transform:translateX(0);}
+.swipe-hint{position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:60px;background:var(--orange);border-radius:0 3px 3px 0;opacity:0;transition:opacity .2s;pointer-events:none;}
+#screen-detail.swiping .swipe-hint{opacity:.7;}
+.detail-hdr{background:var(--graphite);border-bottom:1px solid var(--border);padding:10px 12px;flex-shrink:0;}
+.dh-row1{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.back-btn{width:34px;height:34px;background:var(--card);border:1px solid var(--border);border-radius:7px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--silver);flex-shrink:0;}
+.d-vin{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:22px;color:var(--orange);letter-spacing:.04em;}
+.d-model{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:12px;color:var(--silver);}
+.dh-badges{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;}
+.dh-prog{display:flex;align-items:center;gap:8px;}
+.dh-pct{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:14px;color:var(--orange);flex-shrink:0;}
+.dh-pct.done{color:var(--green);}
+.detail-body{flex:1;overflow-y:auto;padding:10px 12px 20px;}
+
+/* ── KARTA SEKCJE ── */
+.card-section{margin-bottom:18px;}
+.cs-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:11px;letter-spacing:.1em;color:var(--silver2);text-transform:uppercase;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+/* Historia prac */
+.history-row{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);}
+.history-row:last-child{border-bottom:none;}
+.hr-icon{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;margin-top:1px;}
+.hr-done{background:var(--gb);color:var(--green);}
+.hr-active{background:var(--ob);color:var(--orange);}
+.hr-idle{background:var(--panel);color:var(--silver2);}
+.hr-info{flex:1;min-width:0;}
+.hr-name{font-weight:600;font-size:13px;}
+.hr-who{font-size:11px;color:var(--silver2);margin-top:1px;}
+.hr-time{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;color:var(--silver2);text-align:right;flex-shrink:0;}
+/* Materiały */
+.mat-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);}
+.mat-row:last-child{border-bottom:none;}
+.mat-name{flex:1;font-weight:600;font-size:13px;}
+.mat-qty{font-size:12px;color:var(--silver2);}
+.mat-who{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:10px;color:var(--silver);}
+/* Notatki */
+.note-row{display:flex;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);}
+.note-row:last-child{border-bottom:none;}
+.note-av{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:10px;color:#fff;flex-shrink:0;margin-top:1px;}
+.note-content{flex:1;}
+.note-who{font-size:11px;color:var(--silver2);margin-bottom:2px;}
+.note-txt{font-size:13px;line-height:1.4;}
+/* Kryzysy */
+.crisis-row{background:var(--rb);border:1px solid rgba(232,51,74,.3);border-radius:8px;padding:10px;margin-bottom:6px;}
+.cr-type{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:11px;color:var(--red);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px;}
+.cr-desc{font-size:13px;line-height:1.4;}
+/* Finanse (admin) */
+.fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.fin-card{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:10px 12px;}
+.fin-lbl{font-size:10px;color:var(--silver2);font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.06em;text-transform:uppercase;}
+.fin-val{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:20px;color:var(--orange);margin-top:1px;}
+.fin-val.big{font-size:26px;}
+/* Akcje na dole karty */
+.detail-actions{display:flex;gap:8px;margin-top:12px;}
+
+/* ── ADMIN SCREEN ── */
+#screen-admin{position:fixed;inset:0;background:var(--black);z-index:300;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;}
+#screen-admin.open{transform:translateX(0);}
+.admin-hdr{background:var(--graphite);border-bottom:2px solid var(--orange);padding:10px 12px;display:flex;align-items:center;gap:9px;flex-shrink:0;}
+.admin-body{flex:1;overflow-y:auto;padding:10px 12px 30px;}
+.admin-sec{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:11px;letter-spacing:.1em;color:var(--orange);text-transform:uppercase;padding:8px 0 5px;border-bottom:1px solid var(--border);margin-bottom:8px;margin-top:14px;display:flex;align-items:center;justify-content:space-between;}
+
+/* ── STATS ── */
+.podium{display:flex;gap:6px;padding:8px 12px;}
+.podium-card{flex:1;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 6px;text-align:center;}
+.podium-card.gold{border-color:var(--gold);}
+.podium-card.silver-p{border-color:var(--silver);}
+.podium-card.bronze-p{border-color:#CD7F32;}
+.pod-av{width:38px;height:38px;border-radius:9px;margin:0 auto 5px;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:15px;color:#fff;}
+.pod-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;}
+.pod-val{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:20px;color:var(--orange);}
+.pod-lbl{font-size:10px;color:var(--silver2);}
+
+/* ── SHARED ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:500;display:none;align-items:flex-end;backdrop-filter:blur(4px);}
+.sheet{background:var(--panel);border-radius:16px 16px 0 0;border-top:2px solid var(--orange);width:100%;max-height:92dvh;overflow-y:auto;padding:14px 14px calc(20px + env(safe-area-inset-bottom,0));}
+.sh{width:34px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 14px;}
+.stitle{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:20px;margin-bottom:14px;}
+.fg{margin-bottom:10px;}
+.fl{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;letter-spacing:.08em;color:var(--silver2);text-transform:uppercase;margin-bottom:3px;display:block;}
+.fi{width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--white);padding:10px 12px;font-family:'Barlow',sans-serif;font-size:15px;outline:none;transition:border-color .15s;-webkit-appearance:none;}
+.fi:focus{border-color:var(--orange);}
+.fi::placeholder{color:var(--silver2);}
+select.fi{appearance:none;cursor:pointer;}
+select.fi option{background:var(--card);}
+textarea.fi{resize:none;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.row{display:flex;gap:8px;}
+.row>*{flex:1;}
+.tog-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);}
+.tog-lbl{font-size:14px;font-weight:500;}
+.toggle{position:relative;display:inline-block;width:42px;height:22px;}
+.toggle input{opacity:0;width:0;height:0;}
+.sl{position:absolute;cursor:pointer;inset:0;background:var(--border);border-radius:22px;transition:.2s;}
+.sl:before{content:'';position:absolute;width:16px;height:16px;left:3px;top:3px;background:var(--silver2);border-radius:50%;transition:.2s;}
+input:checked+.sl{background:var(--orange);}
+input:checked+.sl:before{transform:translateX(20px);background:#000;}
+.btn{border:none;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.06em;border-radius:8px;transition:.12s;display:inline-flex;align-items:center;justify-content:center;gap:5px;}
+.btn:active{transform:scale(.94);}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+.bp{background:var(--orange);color:#000;padding:12px 18px;font-size:14px;width:100%;}
+.bs{background:var(--card);color:var(--silver);border:1px solid var(--border);padding:10px 14px;font-size:13px;}
+.bd{background:var(--rb);color:var(--red);border:1px solid rgba(232,51,74,.4);padding:10px 14px;font-size:13px;}
+.bsm{padding:5px 9px;font-size:11px;border-radius:6px;}
+.bgh{background:none;border:1px solid var(--border);color:var(--silver2);padding:5px 9px;font-size:11px;border-radius:6px;}
+.photo-up{background:var(--card);border:2px dashed var(--border);border-radius:10px;height:86px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;color:var(--silver2);font-size:11px;font-family:'Barlow Condensed',sans-serif;font-weight:600;position:relative;overflow:hidden;transition:.15s;}
+.photo-up.ok{border-color:var(--green);border-style:solid;}
+.photo-up input{position:absolute;inset:0;opacity:0;cursor:pointer;}
+.photo-up img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:50px 20px;}
+.empty-icon{font-size:44px;opacity:.2;}
+.empty-txt{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:600;text-align:center;color:var(--silver2);}
+#toast{position:fixed;top:58px;left:50%;transform:translateX(-50%) translateY(-70px);background:var(--card);border:1px solid var(--border);border-radius:10px;padding:9px 16px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;z-index:9999;transition:transform .28s cubic-bezier(.4,0,.2,1);white-space:nowrap;box-shadow:0 6px 28px rgba(0,0,0,.5);}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#toast.ok{border-color:var(--green);color:var(--green);}
+#toast.err{border-color:var(--red);color:var(--red);}
+#toast.info{border-color:var(--orange);color:var(--orange);}
+.div{height:1px;background:var(--border);margin:6px 0;}
+@media print{
+  #screen-login,#app,#screen-admin,#toast{display:none!important;}
+  #screen-detail{position:static!important;transform:none!important;background:#fff!important;}
+  .detail-hdr{background:#fff!important;border:2px solid #FF6B00;border-radius:8px;margin-bottom:12px;}
+  .detail-body{overflow:visible!important;}
+  @page{margin:10mm;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="screen-login">
+  <div class="login-logo">NASZE <b>WÓZKI</b></div>
+  <div class="login-sub">STILL MES · HALA SERWISOWA</div>
+  <div class="login-grid" id="login-grid"></div>
+  <div class="pin-wrap" id="pin-wrap" style="display:none;">
+    <div class="pin-box">
+      <div class="pin-title" id="pin-title">Podaj PIN</div>
+      <div class="pin-sub" id="pin-sub">Wprowadź swój 4-cyfrowy PIN</div>
+      <div class="pin-dots">
+        <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
+        <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
+      </div>
+      <div class="pin-grid">
+        <button class="pin-key" onclick="pp('1')">1</button>
+        <button class="pin-key" onclick="pp('2')">2<sub>ABC</sub></button>
+        <button class="pin-key" onclick="pp('3')">3<sub>DEF</sub></button>
+        <button class="pin-key" onclick="pp('4')">4<sub>GHI</sub></button>
+        <button class="pin-key" onclick="pp('5')">5<sub>JKL</sub></button>
+        <button class="pin-key" onclick="pp('6')">6<sub>MNO</sub></button>
+        <button class="pin-key" onclick="pp('7')">7<sub>PQRS</sub></button>
+        <button class="pin-key" onclick="pp('8')">8<sub>TUV</sub></button>
+        <button class="pin-key" onclick="pp('9')">9<sub>WXYZ</sub></button>
+        <button class="pin-key del" onclick="pd()">⌫</button>
+        <button class="pin-key orange" onclick="pp('0')">0</button>
+        <button class="pin-key" style="opacity:0;pointer-events:none"></button>
+      </div>
+      <div class="pin-hint" id="pin-hint">PIN chroni Twój profil</div>
+    </div>
+    <button class="pin-back" onclick="loginBack()">← Wróć do wyboru</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none;">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="logo-sq">NW</div>
+      <div class="logo-txt">NASZE <b>WÓZKI</b></div>
+    </div>
+    <div class="topbar-right">
+      <div class="active-pill" id="active-pill">⏱ <span id="active-cnt">0</span></div>
+      <div id="fb-status" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:10px;color:var(--silver2);padding:2px 6px;">📴</div>
+      <div class="wchip" id="wchip" onclick="navTo('moje')">
+        <div class="wchip-dot" id="wchip-dot">?</div>
+        <span class="wchip-name" id="wchip-name">Ja</span>
+      </div>
+      <button class="icon-btn" id="admin-btn" onclick="openAdmin()" style="display:none;" title="Panel Szefa">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </button>
+      <button class="icon-btn" onclick="showLogin()" title="Zmień pracownika">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- MOJE -->
+    <div id="view-moje" class="view active">
+      <div class="moje-header">
+        <div class="moje-greeting" id="moje-greeting">Cześć, <span>Pracowniku</span>!</div>
+        <div class="moje-role" id="moje-role">Twoje zadania</div>
+        <div class="moje-stats" id="moje-stats"></div>
+      </div>
+      <div id="moje-body" style="padding-bottom:80px;"></div>
+    </div>
+
+    <!-- HALA (kanban) -->
+    <div id="view-hala" class="view">
+      <div class="kanban-wrap" id="kanban-body"></div>
+    </div>
+
+    <!-- LISTA -->
+    <div id="view-lista" class="view">
+      <div class="filter-bar">
+        <div class="ftab on" id="tab-nowe"          onclick="setFilter('nowe')">NOWE<span class="fc" id="fc-nowe">0</span></div>
+        <div class="ftab"    id="tab-reanimacja"    onclick="setFilter('reanimacja')">W PRACY<span class="fc" id="fc-reanimacja">0</span></div>
+        <div class="ftab"    id="tab-skompletowane" onclick="setFilter('skompletowane')">GOTOWE<span class="fc" id="fc-skompletowane">0</span></div>
+        <div class="ftab"    id="tab-archiwum"      onclick="setFilter('archiwum')">ARCH<span class="fc" id="fc-archiwum">0</span></div>
+      </div>
+      <div class="search-wrap">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--silver2)" stroke-width="2" style="flex-shrink:0"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="search-in" class="search-inp" placeholder="Szukaj VIN, modelu..." oninput="renderLista()" autocomplete="off">
+        <button id="search-x" onclick="clearSearch()" style="display:none;background:none;border:none;color:var(--silver2);cursor:pointer;font-size:16px;padding:0;">✕</button>
+      </div>
+      <div id="lista-body" style="padding:5px 0 80px;"></div>
+    </div>
+
+    <!-- WYNIKI -->
+    <div id="view-wyniki" class="view">
+      <div id="wyniki-body" style="padding-bottom:80px;"></div>
+    </div>
+  </div>
+
+  <div class="bnav">
+    <button class="bnav-btn on" id="nav-moje" onclick="navTo('moje')">
+      <svg class="bnav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0 1 12 0v2"/></svg>MOJE
+    </button>
+    <button class="bnav-btn" id="nav-hala" onclick="navTo('hala')">
+      <svg class="bnav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="5" height="18" rx="1"/><rect x="10" y="3" width="5" height="11" rx="1"/><rect x="17" y="3" width="4" height="7" rx="1"/></svg>HALA
+    </button>
+    <button class="bnav-btn" id="nav-lista" onclick="navTo('lista')">
+      <svg class="bnav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>LISTA
+    </button>
+    <button class="bnav-btn" id="nav-wyniki" onclick="navTo('wyniki')">
+      <svg class="bnav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>WYNIKI
+    </button>
+  </div>
+
+  <button class="fab" id="fab" onclick="openAddWozek()">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+</div>
+
+<!-- KARTA WÓZKA -->
+<div id="screen-detail">
+  <div class="swipe-hint"></div>
+  <div class="detail-hdr">
+    <div class="dh-row1">
+      <button class="back-btn" onclick="closeDetail()">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div style="flex:1;min-width:0;">
+        <div class="d-vin" id="d-vin">—</div>
+        <div class="d-model" id="d-model">—</div>
+      </div>
+      <div style="display:flex;gap:5px;">
+        <button id="d-mine-btn" onclick="toggleMine()" class="bgh bsm" style="display:none;">☆ MOJE</button>
+        <button id="d-edit-btn" onclick="openEditWozek()" class="icon-btn" style="display:none;width:30px;height:30px;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button onclick="printWozek()" class="icon-btn" style="width:30px;height:30px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="dh-badges" id="d-badges"></div>
+    <div class="dh-prog">
+      <div class="prog-track" style="flex:1;"><div class="prog-fill" id="d-bar" style="width:0%"></div></div>
+      <div class="dh-pct" id="d-pct">0%</div>
+    </div>
+  </div>
+  <div class="detail-body" id="detail-body"></div>
+</div>
+
+<!-- ADMIN -->
+<div id="screen-admin">
+  <div class="admin-hdr">
+    <button class="back-btn" onclick="closeAdmin()" style="background:var(--ob);border-color:var(--orange);">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <div style="flex:1;">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:17px;color:var(--orange);">PANEL SZEFA</div>
+      <div style="font-size:11px;color:var(--silver2);">Nasze Wózki MES v8.0</div>
+    </div>
+    <div style="display:flex;gap:5px;">
+      <button class="btn bs bsm" onclick="exportCSV()">📊 CSV</button>
+      <button class="btn bd bsm" onclick="lockAdmin()">🔒</button>
+    </div>
+  </div>
+  <div class="admin-body" id="admin-body"></div>
+</div>
+
+<!-- MODALS -->
+<!-- Dodaj wózek -->
+<div id="m-add" class="overlay" onclick="closeM(event,'m-add')">
+<div class="sheet">
+  <div class="sh"></div><div class="stitle">🚜 NOWY WÓZEK</div>
+  <div class="fg"><label class="fl">VIN *</label>
+    <div style="display:flex;gap:6px;">
+      <input id="a-vin" class="fi" type="text" placeholder="np. FN823456" maxlength="30" autocomplete="off" style="text-transform:uppercase;flex:1;">
+      <button onclick="scanVIN()" style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:0 12px;color:var(--orange);cursor:pointer;font-size:18px;flex-shrink:0;" title="Skanuj tabliczkę VIN">📷</button>
+    </div>
+    <input type="file" accept="image/*" id="vin-scan-input" style="display:none;" onchange="handleVINScan(this)">
+  </div>
+  <div class="fg"><label class="fl">Model STILL *</label>
+    <select id="a-model" class="fi" onchange="checkCustomModel('a-model','a-model-custom')">
+      <option value="">— wybierz model —</option>
+      <optgroup label="RX">
+        <option>RX 20</option><option>RX 50</option><option>RX 60</option><option>RX 70</option>
+      </optgroup>
+      <optgroup label="Pozostałe">
+        <option>EGB</option><option>EGV</option><option>EXU-S</option><option>EXV</option>
+        <option>EXV-SF</option><option>FM 14</option><option>FM 20</option><option>FM-X</option>
+        <option>MX-X</option><option>RCE</option>
+      </optgroup>
+      <option value="__inny__">✏️ Inny model...</option>
+    </select>
+    <input id="a-model-custom" class="fi" type="text" placeholder="Wpisz nazwę modelu" style="display:none;margin-top:6px;" autocomplete="off">
+  </div>
+  <div class="g2">
+    <div class="fg"><label class="fl">Klasa</label><select id="a-klasa" class="fi"><option value="bronze">🥉 Brąz</option><option value="silver">🥈 Srebro</option></select></div>
+    <div class="fg"><label class="fl">Budowa</label><select id="a-budowa" class="fi"><option value="kabina">Kabina</option><option value="bez-kabiny">Bez kabiny</option></select></div>
+  </div>
+  <div class="g2">
+    <div class="fg"><label class="fl">Bateria</label><select id="a-bat" class="fi"><option value="kwasowa">Kwasowa</option><option value="li-ion">Li-Ion</option><option value="agm">AGM</option><option value="brak">Brak baterii</option></select></div>
+    <div class="fg"><label class="fl">Stan log.</label><select id="a-stan" class="fi"><option value="plac">Plac</option><option value="hala">Hala</option><option value="magazyn">Magazyn</option></select></div>
+  </div>
+  <div class="tog-row"><span class="tog-lbl">⚡ PILNY</span><label class="toggle"><input type="checkbox" id="a-pilny"><span class="sl"></span></label></div>
+  <div class="tog-row"><span class="tog-lbl">🚗 Jezdny</span><label class="toggle"><input type="checkbox" id="a-jezdny" checked><span class="sl"></span></label></div>
+  <div class="tog-row"><span class="tog-lbl">⬆️ Podnosi</span><label class="toggle"><input type="checkbox" id="a-podnosi" checked><span class="sl"></span></label></div>
+  <div class="tog-row" style="border:none"><span class="tog-lbl">🔧 Ma karetkę/widły</span><label class="toggle"><input type="checkbox" id="a-karetka" checked><span class="sl"></span></label></div>
+  <div class="fg" style="margin-top:10px;"><label class="fl">Notatka</label><textarea id="a-notatka" class="fi" rows="2" placeholder="np. brakuje lusterka..."></textarea></div>
+  <div style="margin-top:8px;">
+    <label class="fl">Foto VIN (tabliczka)</label>
+    <div class="photo-up" id="pv-w" style="height:80px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="6" width="20" height="14" rx="2"/><circle cx="12" cy="13" r="3"/><path d="M8 6l2-3h4l2 3"/></svg><span>📷 Zrób lub wybierz</span><input type="file" accept="image/*" onchange="photoUp(this,'pv-w','pv-p')"><img id="pv-p" style="display:none;"></div>
+  </div>
+  <div style="margin-top:8px;">
+    <label class="fl">Zdjęcia wózka (ile chcesz)</label>
+    <div id="a-photos-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px;"></div>
+    <button type="button" onclick="addPhotoSlot()" style="width:100%;margin-top:6px;background:var(--card);border:2px dashed var(--border);border-radius:8px;padding:10px;color:var(--silver2);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="14" rx="2"/><circle cx="12" cy="13" r="3"/><path d="M8 6l2-3h4l2 3"/></svg>
+      + DODAJ ZDJĘCIE WÓZKA
+    </button>
+  </div>
+  <div class="row" style="margin-top:14px;">
+    <button class="btn bs" onclick="closeById('m-add')">ANULUJ</button>
+    <button class="btn bp" style="flex:2;" onclick="saveNewWozek()">✓ PRZYJMIJ WÓZEK</button>
+  </div>
+</div></div>
+
+<!-- Edytuj wózek -->
+<div id="m-edit" class="overlay" onclick="closeM(event,'m-edit')">
+<div class="sheet">
+  <div class="sh"></div><div class="stitle">✏️ EDYTUJ WÓZEK</div>
+  <div class="fg"><label class="fl">VIN</label><input id="e-vin" class="fi" readonly style="opacity:.5;"></div>
+  <div class="fg"><label class="fl">Model STILL *</label>
+    <select id="e-model" class="fi" onchange="checkCustomModel('e-model','e-model-custom')">
+      <optgroup label="RX">
+        <option>RX 20</option><option>RX 50</option><option>RX 60</option><option>RX 70</option>
+      </optgroup>
+      <optgroup label="Pozostałe">
+        <option>EGB</option><option>EGV</option><option>EXU-S</option><option>EXV</option>
+        <option>EXV-SF</option><option>FM 14</option><option>FM 20</option><option>FM-X</option>
+        <option>MX-X</option><option>RCE</option>
+      </optgroup>
+      <option value="__inny__">✏️ Inny model...</option>
+    </select>
+    <input id="e-model-custom" class="fi" type="text" placeholder="Wpisz nazwę modelu" style="display:none;margin-top:6px;" autocomplete="off">
+  </div>
+  <div class="g2">
+    <div class="fg"><label class="fl">Klasa</label><select id="e-klasa" class="fi"><option value="bronze">🥉 Brąz</option><option value="silver">🥈 Srebro</option></select></div>
+    <div class="fg"><label class="fl">Budowa</label><select id="e-budowa" class="fi"><option value="kabina">Kabina</option><option value="bez-kabiny">Bez kabiny</option></select></div>
+  </div>
+  <div class="g2">
+    <div class="fg"><label class="fl">Bateria</label><select id="e-bat" class="fi"><option value="kwasowa">Kwasowa</option><option value="li-ion">Li-Ion</option><option value="agm">AGM</option><option value="brak">Brak baterii</option></select></div>
+    <div class="fg"><label class="fl">Stan log.</label><select id="e-stan" class="fi"><option value="plac">Plac</option><option value="hala">Hala</option><option value="magazyn">Magazyn</option></select></div>
+  </div>
+  <div class="tog-row"><span class="tog-lbl">⚡ PILNY</span><label class="toggle"><input type="checkbox" id="e-pilny"><span class="sl"></span></label></div>
+  <div class="tog-row"><span class="tog-lbl">🚗 Jezdny</span><label class="toggle"><input type="checkbox" id="e-jezdny"><span class="sl"></span></label></div>
+  <div class="tog-row"><span class="tog-lbl">⬆️ Podnosi</span><label class="toggle"><input type="checkbox" id="e-podnosi"><span class="sl"></span></label></div>
+  <div class="tog-row" style="border:none"><span class="tog-lbl">🔧 Ma karetkę/widły</span><label class="toggle"><input type="checkbox" id="e-karetka"><span class="sl"></span></label></div>
+  <div class="row" style="margin-top:14px;">
+    <button class="btn bd bsm" onclick="confirmDel()">🗑</button>
+    <button class="btn bs" onclick="closeById('m-edit')">ANULUJ</button>
+    <button class="btn bp" style="flex:2;" onclick="saveEditWozek()">💾 ZAPISZ</button>
+  </div>
+</div></div>
+
+<!-- Dodaj notatkę -->
+<div id="m-note" class="overlay" onclick="closeM(event,'m-note')">
+<div class="sheet">
+  <div class="sh"></div><div class="stitle">💬 DODAJ NOTATKĘ</div>
+  <div class="fg"><textarea id="note-txt" class="fi" rows="4" placeholder="Napisz notatkę..."></textarea></div>
+  <div class="row">
+    <button class="btn bs" onclick="closeById('m-note')">ANULUJ</button>
+    <button class="btn bp" style="flex:2;" onclick="saveNote()">✓ DODAJ</button>
+  </div>
+</div></div>
+
+<!-- Pobierz materiał -->
+<div id="m-mat" class="overlay" onclick="closeM(event,'m-mat')">
+<div class="sheet">
+  <div class="sh"></div><div class="stitle">📦 POBIERZ MATERIAŁ</div>
+  <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;color:var(--silver2);letter-spacing:.08em;margin-bottom:6px;">PAKIETY BAZOWE</div>
+  <div id="m-pakiety" style="margin-bottom:10px;"></div>
+  <div class="div"></div>
+  <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;color:var(--silver2);letter-spacing:.08em;margin-top:8px;margin-bottom:6px;">Z MAGAZYNU</div>
+  <div id="m-mag-list" style="max-height:200px;overflow-y:auto;margin-bottom:10px;"></div>
+  <div class="div"></div>
+  <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;color:var(--silver2);letter-spacing:.08em;margin-top:8px;margin-bottom:6px;">RĘCZNIE</div>
+  <div class="fg"><label class="fl">Nazwa</label><input id="mat-name" class="fi" type="text" placeholder="np. Farba bazowa"></div>
+  <div class="g2">
+    <div class="fg"><label class="fl">Ilość</label><input id="mat-qty" class="fi" type="text" placeholder="1L / 2 szt"></div>
+    <div class="fg mat-cost-fg" style="display:none;"><label class="fl">Koszt (zł)</label><input id="mat-cost" class="fi" type="number" min="0" step="0.01" placeholder="0.00"></div>
+  </div>
+  <div class="row">
+    <button class="btn bs" onclick="closeById('m-mat')">ANULUJ</button>
+    <button class="btn bp" style="flex:2;" onclick="saveManualMat()">✓ DODAJ</button>
+  </div>
+</div></div>
+
+<!-- Zgłoś problem -->
+<div id="m-crisis" class="overlay" onclick="closeM(event,'m-crisis')">
+<div class="sheet" style="border-top-color:var(--red);">
+  <div class="sh"></div><div class="stitle" style="color:var(--red);">🚨 ZGŁOŚ PROBLEM</div>
+  <div class="fg"><label class="fl">Typ</label>
+    <select id="cr-type" class="fi"><option value="brak-czesci">Brak części</option><option value="uszkodzenie">Uszkodzenie elementu</option><option value="urwana-sruba">Urwana śruba/złączka</option><option value="usterka-el">Usterka elektryczna</option><option value="czekam-decyzja">Czekam na decyzję</option><option value="inny">Inny problem</option></select></div>
+  <div class="fg"><label class="fl">Opis *</label><textarea id="cr-desc" class="fi" rows="3" placeholder="Opisz dokładnie co się stało..."></textarea></div>
+  <div class="row">
+    <button class="btn bs" onclick="closeById('m-crisis')">ANULUJ</button>
+    <button class="btn" style="flex:2;background:var(--red);color:#fff;" onclick="saveCrisis()">🚨 ZGŁOŚ</button>
+  </div>
+</div></div>
+
+<!-- Potwierdź -->
+<div id="m-confirm" class="overlay" onclick="closeM(event,'m-confirm')">
+<div class="sheet" style="border-top-color:var(--red);">
+  <div class="sh"></div>
+  <div class="stitle" id="conf-title" style="color:var(--red);">Potwierdź</div>
+  <div id="conf-body" style="font-size:14px;color:var(--silver);margin-bottom:16px;line-height:1.5;"></div>
+  <div class="row">
+    <button class="btn bs" onclick="closeById('m-confirm')">ANULUJ</button>
+    <button class="btn" id="conf-ok" style="flex:2;background:var(--red);color:#fff;" onclick="doConfirm()">POTWIERDŹ</button>
+  </div>
+</div></div>
+
+<div id="toast"></div>
+<script>
+// ═══════════════════════════════════════════════
+// NASZE WÓZKI MES v8.0
+// Prosta. Procesowa. Dla hali.
+// ═══════════════════════════════════════════════
+const VER = '8.1.0';
+
+// ── ETAPY PROCESU ─────────────────────────────
+// ── ETAPY PROCESU ─────────────────────────────
+const ETAPY = [
+  {id:'plac',       name:'PLAC',       color:'#6E6E7A', ops:['op01','op02']},
+  {id:'demontaz',   name:'DEMONTAŻ',   color:'#F59E0B', ops:['op03']},
+  {id:'myjnia',     name:'MYJNIA',     color:'#3B82F6', ops:['op04','op05']},
+  {id:'duza-hala',  name:'DUŻA HALA',  color:'#FF6B00', ops:['op06','op07','op08','op09','op10','op11','op12','op13','op14','op15','op16','op17','op18','op19','op20','op21','op22','op23','op24','op25']},
+  {id:'mala-hala',  name:'MAŁA HALA',  color:'#8B5CF6', ops:['op26','op27']},
+  {id:'skladalnia', name:'SKŁADALNIA', color:'#22C55E', ops:['op28','op29','op30']},
+  {id:'laweta',     name:'LAWETA',     color:'#E8334A', ops:['op31']},
+];
+
+// ── ROLE ─────────────────────────────────────
+const ROLE_DEF = [
+  {id:'przyjecie',  name:'Przyjęcie/Wydanie', ops:['op01','op02','op31']},
+  {id:'rozbieracz', name:'Rozbieracz',        ops:['op03']},
+  {id:'myjnia',     name:'Myjnia',            ops:['op04','op05']},
+  {id:'szlifierz',  name:'Szlifierz',         ops:['op06','op07','op08','op09']},
+  {id:'okleja',     name:'Okleja',            ops:['op10','op11','op12','op13']},
+  {id:'blacharz',   name:'Blacharz',          ops:['op14','op15','op16','op17']},
+  {id:'lakiernik',  name:'Lakiernik',         ops:['op18','op19','op20','op21','op22','op23']},
+  {id:'kola',       name:'Koła',              ops:['op24','op25']},
+  {id:'plastyki',   name:'Plastyki',          ops:['op26','op27']},
+  {id:'skladanie',  name:'Składalnia',        ops:['op28','op29','op30']},
+];
+
+const WORKER_COLORS = ['#FF6B00','#3B82F6','#22C55E','#F59E0B','#8B5CF6','#EC4899','#14B8A6','#F97316','#06B6D4','#84CC16','#EF4444','#A855F7'];
+const NO_CW = ['FM-X','FM 14','FM 20','EXU-S','EXV','EXV-SF','EGV','EGB','RCE','MX-X'];
+
+// ── DEFAULT DATA ──────────────────────────────
+const DEF_OPS = [
+  {id:'op01',order:1,  name:'Przyjęcie',                    group:'PRZYGOTOWANIE', skip:null},
+  {id:'op02',order:2,  name:'Fotografowanie',               group:'PRZYGOTOWANIE', skip:null},
+  {id:'op03',order:3,  name:'Rozbieranie',                  group:'PRZYGOTOWANIE', skip:null},
+  {id:'op04',order:4,  name:'Mycie wózka',                  group:'MYJNIA',        skip:null},
+  {id:'op05',order:5,  name:'Wydmuchanie komputera',        group:'MYJNIA',        skip:null},
+  {id:'op06',order:6,  name:'Szlifowanie kabiny',           group:'SZLIFOWANIE',   skip:null},
+  {id:'op07',order:7,  name:'Szlifowanie masztu',           group:'SZLIFOWANIE',   skip:null},
+  {id:'op08',order:8,  name:'Szlifowanie przeciwwagi',      group:'SZLIFOWANIE',   skip:'bez_przeciwwagi'},
+  {id:'op09',order:9,  name:'Szlifowanie elementów',        group:'SZLIFOWANIE',   skip:null},
+  {id:'op10',order:10, name:'Oklejanie masztu',             group:'OKLEJANIE',     skip:null},
+  {id:'op11',order:11, name:'Oklejanie kabiny',             group:'OKLEJANIE',     skip:null},
+  {id:'op12',order:12, name:'Oklejanie przeciwwagi',        group:'OKLEJANIE',     skip:'bez_przeciwwagi'},
+  {id:'op13',order:13, name:'Oklejanie elementów',          group:'OKLEJANIE',     skip:null},
+  {id:'op14',order:14, name:'Prostowanie kabiny',           group:'BLACHARSTWO',   skip:null},
+  {id:'op15',order:15, name:'Prostowanie elementów',        group:'BLACHARSTWO',   skip:null},
+  {id:'op16',order:16, name:'Szpachlowanie kabiny',         group:'BLACHARSTWO',   skip:'bronze'},
+  {id:'op17',order:17, name:'Szpachlowanie masztu',         group:'BLACHARSTWO',   skip:'bronze'},
+  {id:'op18',order:18, name:'Szpachlowanie przeciwwagi',    group:'BLACHARSTWO',   skip:'bronze_lub_bez_przeciwwagi'},
+  {id:'op19',order:19, name:'Odtłuszczanie masztu',         group:'MALOWANIE',     skip:null},
+  {id:'op20',order:20, name:'Malowanie masztu',             group:'MALOWANIE',     skip:null},
+  {id:'op21',order:21, name:'Malowanie przeciwwagi',        group:'MALOWANIE',     skip:'bez_przeciwwagi'},
+  {id:'op22',order:22, name:'Malowanie kabiny',             group:'MALOWANIE',     skip:null},
+  {id:'op23',order:23, name:'Malowanie elementów',          group:'MALOWANIE',     skip:null},
+  {id:'op24',order:24, name:'Tylne koła',                   group:'KOŁA',          skip:'bronze_lub_bez_przeciwwagi'},
+  {id:'op25',order:25, name:'Przednie koła',                group:'KOŁA',          skip:'bronze'},
+  {id:'op26',order:26, name:'Mycie plastików',              group:'PLASTIKI',      skip:null},
+  {id:'op27',order:27, name:'Malowanie plastików',          group:'PLASTIKI',      skip:null},
+  {id:'op28',order:28, name:'Rozklejanie',                  group:'MONTAŻ',        skip:null},
+  {id:'op29',order:29, name:'Składanie',                    group:'MONTAŻ',        skip:null},
+  {id:'op30',order:30, name:'Mycie końcowe / wyprawki',     group:'MONTAŻ',        skip:null},
+  {id:'op31',order:31, name:'Wydanie',                      group:'WYDANIE',       skip:null},
+];
+
+const DEF_WORKERS = [
+  {id:'w01',name:'Milena Janus',         initials:'MJ', pin:'1111',role:['przyjecie'],                                                          myWozki:[]},
+  {id:'w02',name:'Bartosz Janus',        initials:'BJ', pin:'2222',role:['przyjecie'],                                                          myWozki:[]},
+  {id:'w03',name:'Mateusz Janus',        initials:'MaJ',pin:'3333',role:['plastyki','skladanie'],                                               myWozki:[]},
+  {id:'w04',name:'Kamil Pyzia',          initials:'KP', pin:'4444',role:['plastyki','skladanie','rozbieracz','kola'],                            myWozki:[]},
+  {id:'w05',name:'Krzysztof Pyzia',      initials:'KPy',pin:'5555',role:['rozbieracz','szlifierz','okleja','blacharz','kola'],                   myWozki:[]},
+  {id:'w06',name:'Maciej Szczodrzyński', initials:'MS', pin:'6666',role:['rozbieracz','szlifierz','okleja','blacharz','kola','lakiernik'],       myWozki:[]},
+  {id:'w07',name:'Andrzej Tomaszewski',  initials:'AT', pin:'7777',role:['myjnia','kola','szlifierz','okleja'],                                  myWozki:[]},
+  {id:'w08',name:'Mateusz Kuźniak',      initials:'MK', pin:'8888',role:['rozbieracz','szlifierz','okleja','kola','blacharz','lakiernik'],       myWozki:[]},
+  {id:'w09',name:'Bartosz Garcon',       initials:'BG', pin:'9999',role:['szlifierz','okleja','myjnia','blacharz','kola'],                      myWozki:[]},
+];
+const DEF_MAG = [
+  {id:'m_app02',nazwa:'Papier ścierny P60',    indeks:'40KZU060',dostawca:'APP', jed:'szt',cena:0,stan:21},
+  {id:'m_app03',nazwa:'Papier ścierny P120',   indeks:'40KZU120',dostawca:'APP', jed:'szt',cena:0,stan:6},
+  {id:'m_app04',nazwa:'Papier ścierny P180',   indeks:'40HMF180',dostawca:'APP', jed:'szt',cena:0,stan:12},
+  {id:'m_app05',nazwa:'Papier ścierny P320',   indeks:'40HMF320',dostawca:'APP', jed:'szt',cena:0,stan:2},
+  {id:'m_app08',nazwa:'Rękawiczki L',          indeks:'90673',   dostawca:'APP', jed:'szt',cena:0,stan:10},
+  {id:'m_app24',nazwa:'Włóknina',              indeks:'',        dostawca:'APP', jed:'szt',cena:0,stan:35},
+  {id:'m_app26',nazwa:'Remover',               indeks:'211001',  dostawca:'APP', jed:'szt',cena:0,stan:1},
+  {id:'m_bol08',nazwa:'Szmatka antystatyczna', indeks:'3003',    dostawca:'BOLL',jed:'szt',cena:0,stan:35},
+  {id:'m_bol09',nazwa:'Taśma 50mm 80ST',       indeks:'4005',    dostawca:'BOLL',jed:'szt',cena:0,stan:42},
+  {id:'m_bol10',nazwa:'Lakier zderzaków czarny',indeks:'1016',   dostawca:'BOLL',jed:'szt',cena:0,stan:11},
+  {id:'m_bol12',nazwa:'Utwardzacz do szpachlu',indeks:'2023',    dostawca:'BOLL',jed:'szt',cena:0,stan:5},
+  {id:'m_bol13',nazwa:'Ściernica talerzowa',   indeks:'50130',   dostawca:'BOLL',jed:'szt',cena:0,stan:7},
+  {id:'m_bol14',nazwa:'Ściernica lamelkowa P40',indeks:'50125',  dostawca:'BOLL',jed:'szt',cena:0,stan:5},
+  {id:'m_bol15',nazwa:'Szpachlówka natryskowa',indeks:'2022',    dostawca:'BOLL',jed:'szt',cena:0,stan:11},
+  {id:'m_bol16',nazwa:'Taśma 19mm 80ST',       indeks:'4001',    dostawca:'BOLL',jed:'szt',cena:0,stan:20},
+  {id:'m_bol17',nazwa:'Tarcza do cięcia',      indeks:'501181',  dostawca:'BOLL',jed:'szt',cena:0,stan:50},
+  {id:'m_bol24',nazwa:'Szpachel Soft Light 1kg',indeks:'2024',   dostawca:'BOLL',jed:'szt',cena:0,stan:11},
+  {id:'m_bol27',nazwa:'Sitko papierowe',       indeks:'30081',   dostawca:'BOLL',jed:'szt',cena:0,stan:100},
+  {id:'m_mpm01',nazwa:'Rozcieńczalnik 885',    indeks:'',        dostawca:'MPMX',jed:'L',  cena:0,stan:1},
+  {id:'m_lin01',nazwa:'Farba srebrna 9006',    indeks:'9006',    dostawca:'LINDA',jed:'L', cena:0,stan:4},
+  {id:'m_lin02',nazwa:'Farba popielata 7021',  indeks:'7021',    dostawca:'LINDA',jed:'L', cena:0,stan:1},
+  {id:'m_lin03',nazwa:'Farba pomarańczowa 2000',indeks:'2000',   dostawca:'LINDA',jed:'L', cena:0,stan:3},
+  {id:'m_lin05',nazwa:'Nitro',                 indeks:'',        dostawca:'LINDA',jed:'L', cena:0,stan:11},
+  {id:'m_lin06',nazwa:'Podkład szary',         indeks:'',        dostawca:'LINDA',jed:'L', cena:0,stan:30},
+  {id:'m_lin07',nazwa:'Utwardzacz Linda 9060', indeks:'9060',    dostawca:'LINDA',jed:'szt',cena:0,stan:1},
+  {id:'m_inn01',nazwa:'Krążki do maszyny',     indeks:'',        dostawca:'INNE', jed:'szt',cena:0,stan:8},
+  {id:'m_inn02',nazwa:'Olej Coralia',          indeks:'',        dostawca:'INNE', jed:'L',  cena:0,stan:2},
+  {id:'m_inn15',nazwa:'Pasta BHP',             indeks:'',        dostawca:'INNE', jed:'szt',cena:0,stan:3},
+];
+
+const DEF_PAK = [
+  {id:'pak01',nazwa:'Srebro — kabina (RX)',modele:['RX 20','RX 50','RX 60','RX 70'],klasa:'silver',
+   produkty:[{id:'m_bol08',il:2},{id:'m_bol09',il:1},{id:'m_app03',il:5},{id:'m_app04',il:3},{id:'m_lin06',il:1},{id:'m_lin01',il:1},{id:'m_mpm01',il:1}]},
+  {id:'pak02',nazwa:'Brąz — kabina (RX)',  modele:['RX 20','RX 50','RX 60','RX 70'],klasa:'bronze',
+   produkty:[{id:'m_bol08',il:1},{id:'m_bol09',il:1},{id:'m_app03',il:3},{id:'m_lin06',il:1},{id:'m_lin01',il:1}]},
+  {id:'pak03',nazwa:'Bez kabiny / maszt',  modele:['FM-X','FM 14','FM 20','EXU-S','EXV','EXV-SF','EGV','EGB','RCE','MX-X'],klasa:'both',
+   produkty:[{id:'m_bol08',il:1},{id:'m_app03',il:3},{id:'m_lin02',il:1},{id:'m_lin06',il:1},{id:'m_mpm01',il:1}]},
+];
+
+const DEF_SET = {hourlyRate:75, adminPin:'1234', ntfyChannel:''};
+
+// ── FIREBASE CONFIG ───────────────────────────
+const FB_CFG = {
+  apiKey: "AIzaSyADsqzT_cknV-qQSu2-0Md366j2_NTK6yI",
+  authDomain: "nasze-wozki.firebaseapp.com",
+  databaseURL: "https://nasze-wozki-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "nasze-wozki",
+  storageBucket: "nasze-wozki.firebasestorage.app",
+  messagingSenderId: "483001994607",
+  appId: "1:483001994607:web:27f70971aaa3abbb2cac9a"
+};
+
+// ── LOCAL STORAGE (backup + szybki odczyt) ────
+const LS = {W:'nw8_wozki',WK:'nw8_workers',OPS:'nw8_ops_v83',SET:'nw8_settings',MAG:'nw8_magazyn',PAK:'nw8_pakiety'};
+const lsG=(k,fb=null)=>{try{const r=localStorage.getItem(k);return r?JSON.parse(r):fb;}catch{return fb;}};
+const lsS=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}};
+
+// ── FIREBASE STATE ────────────────────────────
+let fbApp=null,fbDb=null,fbReady=false;
+let _fbListeners={}; // aktywne listenery
+
+// Inicjalizacja Firebase
+function initFirebase(){
+  try{
+    const s1=document.createElement('script');
+    s1.src='https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js';
+    s1.onload=()=>{
+      const s2=document.createElement('script');
+      s2.src='https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js';
+      s2.onload=()=>{
+        try{
+          fbApp=firebase.initializeApp(FB_CFG);
+          fbDb=firebase.database();
+          fbReady=true;
+          showConnectionStatus(true);
+          // Załaduj dane z Firebase jako główne źródło, potem pokaż aplikację
+          loadFromFirebase();
+        }catch(e){
+          console.warn('Firebase init error:',e);
+          showConnectionStatus(false);
+          afterDataLoaded();
+        }
+      };
+      s2.onerror=()=>{showConnectionStatus(false);afterDataLoaded();};
+      document.head.appendChild(s2);
+    };
+    s1.onerror=()=>{
+      console.warn('Firebase SDK niedostępny — tryb offline');
+      showConnectionStatus(false);
+      afterDataLoaded();
+    };
+    document.head.appendChild(s1);
+  }catch(e){showConnectionStatus(false);afterDataLoaded();}
+}
+
+function showConnectionStatus(online){
+  const el=document.getElementById('fb-status');
+  if(!el)return;
+  if(online){el.textContent='🔥 Online';el.style.color='var(--green)';}
+  else{el.textContent='📴 Offline';el.style.color='var(--silver2)';}
+}
+
+// Załaduj wszystkie dane z Firebase jednorazowo przy starcie
+function loadFromFirebase(){
+  let loaded=0;const total=5;
+  function done(){
+    loaded++;
+    if(loaded>=total){
+      // Wszystkie dane załadowane — wyczyść stary LS, uruchom migrację i pokaż app
+      _doMigrateOps();
+      fixWozkiStatuses();
+      afterDataLoaded();
+      // Teraz uruchom nasłuchiwanie realtime
+      startFbListeners();
+    }
+  }
+
+  // Wózki — główne dane
+  fbDb.ref('wozki').once('value',snap=>{
+    const val=snap.val();
+    if(val!==null){
+      // Firebase ma dane — nadpisz LS całkowicie
+      lsS(LS.W,val);
+    }else{
+      // Firebase puste — wyślij lokalne dane (pierwsze uruchomienie)
+      const local=lsG(LS.W,[]);
+      if(local.length)fbDb.ref('wozki').set(local);
+    }
+    done();
+  });
+
+  fbDb.ref('workers').once('value',snap=>{
+    const val=snap.val();
+    if(val!==null)lsS(LS.WK,val);
+    else fbDb.ref('workers').set(lsG(LS.WK,DEF_WORKERS));
+    done();
+  });
+
+  fbDb.ref('settings').once('value',snap=>{
+    const val=snap.val();
+    if(val!==null)lsS(LS.SET,val);
+    else fbDb.ref('settings').set(lsG(LS.SET,DEF_SET));
+    done();
+  });
+
+  fbDb.ref('magazyn').once('value',snap=>{
+    const val=snap.val();
+    if(val!==null)lsS(LS.MAG,val);
+    else fbDb.ref('magazyn').set(lsG(LS.MAG,DEF_MAG));
+    done();
+  });
+
+  fbDb.ref('pakiety').once('value',snap=>{
+    const val=snap.val();
+    if(val!==null)lsS(LS.PAK,val);
+    else fbDb.ref('pakiety').set(lsG(LS.PAK,DEF_PAK));
+    done();
+  });
+}
+
+// Uruchamia się gdy dane są gotowe (z Firebase lub LS)
+function afterDataLoaded(){
+  updateCounts();
+  if(S.view==='moje')   renderMoje();
+  else if(S.view==='hala')  renderHala();
+  else if(S.view==='lista') renderLista();
+  else if(S.view==='wyniki')renderWyniki();
+}
+
+// ── FIREBASE SYNC ─────────────────────────────
+function fbPath(key){
+  const map={[LS.W]:'wozki',[LS.WK]:'workers',[LS.SET]:'settings',[LS.MAG]:'magazyn',[LS.PAK]:'pakiety'};
+  return map[key]||key;
+}
+
+function fbSet(key,val){
+  lsS(key,val);
+  if(!fbReady)return;
+  try{fbDb.ref(fbPath(key)).set(val);}catch(e){}
+}
+
+let _syncDebounce={};
+// Nasłuchuj zmian realtime (uruchamiane PO załadowaniu początkowych danych)
+function startFbListeners(){
+  // Wózki
+  fbDb.ref('wozki').on('value',snap=>{
+    const val=snap.val();
+    if(val===null)return;
+    const remoteStr=JSON.stringify(val);
+    const localStr=JSON.stringify(lsG(LS.W,[]));
+    if(remoteStr===localStr)return; // bez zmian
+    lsS(LS.W,val);
+    clearTimeout(_syncDebounce.W);
+    _syncDebounce.W=setTimeout(()=>{
+      fixWozkiStatuses();
+      updateCounts();
+      if(S.view==='moje')   renderMoje();
+      else if(S.view==='hala')  renderHala();
+      else if(S.view==='lista') renderLista();
+      else if(S.view==='wyniki')renderWyniki();
+      if(S.detailId){const w=gWozek(S.detailId);if(w){refreshDH(w);renderDetailBody(w);}}
+    },300);
+  });
+
+  fbDb.ref('workers').on('value',snap=>{if(snap.val()!==null)lsS(LS.WK,snap.val());});
+  fbDb.ref('magazyn').on('value',snap=>{if(snap.val()!==null)lsS(LS.MAG,snap.val());});
+  fbDb.ref('pakiety').on('value',snap=>{if(snap.val()!==null)lsS(LS.PAK,snap.val());});
+  fbDb.ref('settings').on('value',snap=>{if(snap.val()!==null)lsS(LS.SET,snap.val());});
+}
+
+function fbListen(key,cb){} // zachowane dla kompatybilności
+
+// ── DATA ACCESS (Firebase + LocalStorage) ────
+const gWozki   =()=>lsG(LS.W,[]);
+const sWozki   =w=>{lsS(LS.W,w);if(fbReady)fbDb.ref('wozki').set(w).catch(()=>{});};
+const gWorkers =()=>lsG(LS.WK,DEF_WORKERS);
+const sWorkers =w=>{lsS(LS.WK,w);if(fbReady)fbDb.ref('workers').set(w).catch(()=>{});};
+const gOps     =()=>DEF_OPS; // zawsze z kodu, nie z LS
+const gSet     =()=>lsG(LS.SET,DEF_SET);
+const sSet     =s=>{lsS(LS.SET,s);if(fbReady)fbDb.ref('settings').set(s).catch(()=>{});};
+const gMag     =()=>lsG(LS.MAG,DEF_MAG);
+const sMag     =m=>{lsS(LS.MAG,m);if(fbReady)fbDb.ref('magazyn').set(m).catch(()=>{});};
+const gPak     =()=>lsG(LS.PAK,DEF_PAK);
+const sPak     =p=>{lsS(LS.PAK,p);if(fbReady)fbDb.ref('pakiety').set(p).catch(()=>{});};
+const gWozek   =id=>gWozki().find(w=>w.id===id)||null;
+const sWozek   =w=>{const a=gWozki();const i=a.findIndex(x=>x.id===w.id);i>=0?a[i]=w:a.push(w);sWozki(a);};
+
+// Wyczyść wszystkie wózki (Firebase + LS)
+function clearAllWozki(){
+  openConfirm('🗑 Wyczyść wszystkie wózki',
+    'Usunie WSZYSTKIE wózki z bazy danych. Tej operacji nie można cofnąć.',
+    'WYCZYŚĆ WSZYSTKO',()=>{
+    lsS(LS.W,[]);
+    if(fbReady)fbDb.ref('wozki').set([]).catch(()=>{});
+    updateCounts();renderLista();renderHala();
+    toast('🗑 Wszystkie wózki usunięte','info');
+  });
+}
+
+// ── STATE ─────────────────────────────────────
+const S = {
+  wkId:null,         // zalogowany pracownik
+  isAdmin:false,
+  view:'moje',
+  filter:'nowe',
+  detailId:null,
+  confCb:null,
+  editId:null,
+  pinBuf:'',
+  pinWkId:null,      // wybrany pracownik na login
+  adminPinBuf:'',
+  tickId:null,
+  serialSel:new Set(),  // zaznaczone do pracy seryjnej
+  serialMode:false,
+  crisisWozekId:null,
+  noteWozekId:null,
+  matWozekId:null,
+};
+
+// ── HELPERS ───────────────────────────────────
+const esc=s=>s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'):'';
+function wColor(id){const ws=gWorkers();const i=ws.findIndex(w=>w.id===id);return WORKER_COLORS[Math.max(i,0)%WORKER_COLORS.length];}
+function gWorker(id){return gWorkers().find(w=>w.id===id)||null;}
+function fmtT(s){if(!s||s<0)return'00:00';const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sc=s%60;if(h>0)return`${h}h ${String(m).padStart(2,'0')}m`;return`${String(m).padStart(2,'0')}:${String(sc).padStart(2,'0')}`;}
+function fmtD(ts){return new Date(ts).toLocaleString('pl-PL',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});}
+function fmtDate(ts){return new Date(ts).toLocaleDateString('pl-PL',{day:'2-digit',month:'2-digit',year:'2-digit'});}
+let _tt;
+function toast(msg,type='info'){
+  const el=document.getElementById('toast');el.textContent=msg;
+  el.className=`show ${type==='success'?'ok':type==='error'?'err':'info'}`;
+  clearTimeout(_tt);_tt=setTimeout(()=>{el.className='';},2500);
+}
+function closeById(id){const el=document.getElementById(id);if(el)el.style.display='none';}
+function closeM(e,id){if(e.target.id===id)closeById(id);}
+function showM(id){document.getElementById(id).style.display='flex';}
+function doConfirm(){closeById('m-confirm');if(S.confCb){S.confCb();S.confCb=null;}}
+function openConfirm(title,body,okLabel,cb){
+  document.getElementById('conf-title').textContent=title;
+  document.getElementById('conf-body').textContent=body;
+  document.getElementById('conf-ok').textContent=okLabel;
+  S.confCb=cb;showM('m-confirm');
+}
+function photoUp(input,wrapId,prevId){
+  const file=input.files[0];if(!file)return;
+  const r=new FileReader();r.onload=e=>{const img=document.getElementById(prevId);img.src=e.target.result;img.style.display='block';document.getElementById(wrapId).classList.add('ok');};r.readAsDataURL(file);
+}
+
+// ── OP RULES ─────────────────────────────────
+function isReq(op,model,klasa){
+  const s=op.skip;if(!s)return true;
+  const noCw=NO_CW.includes(model),bronze=klasa==='bronze';
+  if(s==='bez_przeciwwagi')return !noCw;
+  if(s==='bronze')return !bronze;
+  if(s==='bronze_lub_bez_przeciwwagi')return !bronze&&!noCw;
+  return true;
+}
+function calcProg(w){
+  const req=w.operations.filter(o=>o.wymagana!==false);
+  if(!req.length)return 100;
+  return Math.round(req.filter(o=>o.status==='done').length/req.length*100);
+}
+function getEtap(w){
+  for(const e of ETAPY){
+    const ops=w.operations.filter(o=>e.ops.includes(o.id)&&o.wymagana!==false);
+    if(!ops.length)continue;
+    if(!ops.every(o=>o.status==='done'))return e;
+  }
+  return ETAPY[ETAPY.length-1];
+}
+function liveSecs(op){
+  let t=op.totalSecs||0;const now=Date.now();
+  if(op.status==='in-progress')op.workers.forEach(w=>{if(w.startTs)t+=Math.floor((now-w.startTs)/1000);});
+  return t;
+}
+function countActive(){let n=0;gWozki().forEach(w=>w.operations.forEach(o=>{if(o.status==='in-progress')n++;}));return n;}
+
+// ── MAKE WÓZEK ───────────────────────────────
+function makeWozek({vin,model,klasa,budowa,bateria,stanLog,pilny,jezdny,podnosi,karetka,notatka,photoWozek,photoVin}){
+  const now=Date.now();
+  const w={
+    id:`wz_${now}_${Math.random().toString(36).slice(2,6)}`,
+    vin:vin.toUpperCase(),model,klasa,budowa,bateria,stanLog,
+    pilny:!!pilny,jezdny:!!jezdny,podnosi:!!podnosi,
+    karetka:karetka!==undefined?!!karetka:true,
+    notatka:notatka||'',
+    status:'nowe',hasCrisis:false,
+    operations:gOps().map(op=>({
+      id:op.id,name:op.name,group:op.group,skip:op.skip||null,
+      wymagana:isReq(op,model,klasa),
+      status:'idle',workers:[],totalSecs:0,completedAt:null,startedAt:null,
+    })),
+    materials:[],notes:[],crisisLogs:[],workPhotos:[],
+    completionPhotos:[null,null,null,null],
+    photoWozek:photoWozek||null,photoVin:photoVin||null,
+    createdAt:now,updatedAt:now,progress:0,
+  };
+  if(notatka)w.notes.push({id:`n_${Date.now()}`,workerId:null,text:`📝 Przyjęto: ${notatka}`,ts:now});
+  return w;
+}
+// ══════════════════════════════════════════════
+// LOGIN
+// ══════════════════════════════════════════════
+function showLogin(){
+  S.pinBuf='';S.pinWkId=null;
+  document.getElementById('app').style.display='none';
+  const scr=document.getElementById('screen-login');scr.style.display='flex';
+  document.getElementById('login-grid').style.display='grid';
+  document.getElementById('pin-wrap').style.display='none';
+  renderLoginGrid();
+}
+function renderLoginGrid(){
+  const workers=gWorkers();
+  document.getElementById('login-grid').innerHTML=
+    // Admin tile first
+    `<div class="login-tile admin" onclick="loginSelectAdmin()" style="grid-column:1/-1;">
+      <div class="tile-av" style="background:#FF6B00;width:46px;height:46px;border-radius:10px;font-size:20px;">👑</div>
+      <div class="tile-name">SZEF / ADMIN</div>
+      <div class="tile-role">Pełny dostęp · Panel zarządzania</div>
+    </div>` +
+    workers.map(wk=>{
+      const roles=((wk.role||[]).map(r=>ROLE_DEF.find(x=>x.id===r)?.name||r)).join(' · ')||'Pracownik';
+      return`<div class="login-tile" onclick="loginSelect('${wk.id}')">
+        <div class="tile-av" style="background:${wColor(wk.id)};">${wk.initials}</div>
+        <div class="tile-name">${esc(wk.name)}</div>
+        <div class="tile-role">${esc(roles)}</div>
+      </div>`;
+    }).join('');
+}
+function loginSelect(id){
+  S.pinWkId=id;S.pinBuf='';
+  const wk=gWorker(id);if(!wk)return;
+  document.getElementById('login-grid').style.display='none';
+  document.getElementById('pin-wrap').style.display='block';
+  document.getElementById('pin-title').textContent=`Cześć, ${wk.name.split(' ')[0]}! 👋`;
+  document.getElementById('pin-sub').textContent='Podaj swój PIN';
+  document.getElementById('pin-hint').textContent='PIN chroni Twój profil';
+  for(let i=0;i<4;i++){const d=document.getElementById('pd'+i);if(d)d.classList.remove('on','err');}
+}
+function loginSelectAdmin(){
+  S.pinWkId='__admin__';S.pinBuf='';
+  document.getElementById('login-grid').style.display='none';
+  document.getElementById('pin-wrap').style.display='block';
+  document.getElementById('pin-title').textContent='Panel Szefa 👑';
+  document.getElementById('pin-sub').textContent='Podaj PIN administratora';
+  document.getElementById('pin-hint').textContent='';
+  for(let i=0;i<4;i++){const d=document.getElementById('pd'+i);if(d)d.classList.remove('on','err');}
+}
+function loginBack(){
+  S.pinWkId=null;S.pinBuf='';
+  document.getElementById('login-grid').style.display='grid';
+  document.getElementById('pin-wrap').style.display='none';
+}
+function pp(d){
+  if(S.pinBuf.length>=4)return;S.pinBuf+=d;
+  for(let i=0;i<4;i++){const dot=document.getElementById('pd'+i);if(dot){dot.classList.remove('err');dot.classList.toggle('on',i<S.pinBuf.length);}}
+  if(S.pinBuf.length===4)setTimeout(checkPin,100);
+}
+function pd(){
+  S.pinBuf=S.pinBuf.slice(0,-1);
+  for(let i=0;i<4;i++){const d=document.getElementById('pd'+i);if(d){d.classList.remove('err');d.classList.toggle('on',i<S.pinBuf.length);}}
+}
+function checkPin(){
+  if(S.pinWkId==='__admin__'){
+    if(S.pinBuf===gSet().adminPin){
+      S.isAdmin=true;S.wkId=null;
+      sessionStorage.setItem('nw8_admin','1');
+      sessionStorage.removeItem('nw8_worker');
+      enterApp(null,true);
+    }else pinErr();
+    return;
+  }
+  const wk=gWorker(S.pinWkId);if(!wk)return;
+  if(S.pinBuf===(wk.pin||'1234')){
+    S.wkId=wk.id;S.isAdmin=false;
+    sessionStorage.setItem('nw8_worker',wk.id);
+    sessionStorage.removeItem('nw8_admin');
+    enterApp(wk,false);
+  }else pinErr();
+}
+function pinErr(){
+  for(let i=0;i<4;i++){const d=document.getElementById('pd'+i);if(d){d.classList.remove('on');d.classList.add('err');}}
+  S.pinBuf='';navigator.vibrate?.([60,40,60]);
+  document.getElementById('pin-hint').textContent='❌ Nieprawidłowy PIN — spróbuj ponownie';
+  setTimeout(()=>{for(let i=0;i<4;i++){const d=document.getElementById('pd'+i);if(d)d.classList.remove('err');}},700);
+}
+function enterApp(wk,isAdmin){
+  document.getElementById('screen-login').style.display='none';
+  document.getElementById('app').style.display='flex';
+  // Topbar chip
+  if(wk){
+    const c=wColor(wk.id);const rgb=hexRgb(c);
+    document.getElementById('wchip-dot').textContent=wk.initials;
+    document.getElementById('wchip-dot').style.background=c;
+    document.getElementById('wchip-name').textContent=wk.name.split(' ')[0];
+    document.getElementById('wchip-name').style.color=c;
+    document.getElementById('wchip').style.cssText=`display:flex;align-items:center;gap:5px;border-radius:7px;padding:4px 8px 4px 5px;cursor:pointer;border:1px solid rgba(${rgb},.35);background:rgba(${rgb},.1);`;
+  }else{
+    document.getElementById('wchip-dot').textContent='👑';
+    document.getElementById('wchip-dot').style.background='#FF6B00';
+    document.getElementById('wchip-name').textContent='Szef';
+    document.getElementById('wchip-name').style.color='#FF6B00';
+    document.getElementById('wchip').style.cssText='display:flex;align-items:center;gap:5px;border-radius:7px;padding:4px 8px 4px 5px;cursor:pointer;border:1px solid rgba(255,107,0,.35);background:rgba(255,107,0,.1);';
+  }
+  document.getElementById('admin-btn').style.display=isAdmin?'flex':'none';
+  document.getElementById('fab').style.display=isAdmin?'flex':'none';
+  navTo('moje');
+  const name=wk?wk.name.split(' ')[0]:'Szefie';
+  toast(`👋 Cześć, ${name}!`,'success');
+}
+function hexRgb(hex){
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return`${r},${g},${b}`;
+}
+
+// ══════════════════════════════════════════════
+// ADMIN
+// ══════════════════════════════════════════════
+function openAdmin(){
+  renderAdmin();document.getElementById('screen-admin').classList.add('open');
+}
+function closeAdmin(){document.getElementById('screen-admin').classList.remove('open');}
+function lockAdmin(){
+  S.isAdmin=false;sessionStorage.removeItem('nw8_admin');
+  document.getElementById('admin-btn').style.display='none';
+  document.getElementById('fab').style.display='none';
+  closeAdmin();toast('🔒 Sesja admina zamknięta','info');
+}
+
+// ══════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════
+function navTo(view){
+  S.view=view;S.serialSel.clear();S.serialMode=false;
+  ['moje','hala','lista','wyniki'].forEach(v=>{
+    document.getElementById('nav-'+v).classList.toggle('on',v===view);
+    document.getElementById('view-'+v).classList.toggle('active',v===view);
+  });
+  if(view==='moje')   renderMoje();
+  if(view==='hala')   renderHala();
+  if(view==='lista')  {S.filter='nowe';renderLista();}
+  if(view==='wyniki') renderWyniki();
+}
+
+// ══════════════════════════════════════════════
+// WIDOK MOJE
+// ══════════════════════════════════════════════
+function renderMoje(){
+  const wk=gWorker(S.wkId);
+  const body=document.getElementById('moje-body');
+
+  // Jeśli admin — pokaż podsumowanie
+  if(S.isAdmin&&!wk){
+    renderMojeAdmin();return;
+  }
+  if(!wk){
+    body.innerHTML=`<div class="empty"><div class="empty-icon">👤</div><div class="empty-txt">Zaloguj się aby zobaczyć zadania</div></div>`;return;
+  }
+
+  document.getElementById('moje-greeting').innerHTML=`Cześć, <span>${esc(wk.name.split(' ')[0])}</span>!`;
+  document.getElementById('moje-role').textContent=((wk.role||[]).map(r=>ROLE_DEF.find(x=>x.id===r)?.name||r)).join(' · ')||'Pracownik';
+
+  // Stats dnia
+  const todayTs=new Date().setHours(0,0,0,0);
+  let dzDone=0,dzSecs=0;
+  gWozki().forEach(w=>w.operations.forEach(op=>{
+    if(op.completedAt&&op.completedAt>=todayTs){
+      const e=op.workers.find(x=>x.workerId===S.wkId);if(e){dzDone++;dzSecs+=(e.accSecs||0);}
+    }
+  }));
+  document.getElementById('moje-stats').innerHTML=`
+    <div class="moje-stat"><div class="ms-val">${dzDone}</div><div class="ms-lbl">DZIŚ ZROBIŁEM</div></div>
+    <div class="moje-stat"><div class="ms-val">${fmtT(dzSecs)}</div><div class="ms-lbl">CZAS DZIŚ</div></div>
+    <div class="moje-stat"><div class="ms-val">${countActive()}</div><div class="ms-lbl">AKTYWNE</div></div>`;
+
+  // Zbierz operacje dla ról pracownika
+  const mojeOpIds=new Set((wk.role||[]).flatMap(r=>ROLE_DEF.find(x=>x.id===r)?.ops||[]));
+  const active=[],paused=[],available=[];
+  const wozki=gWozki().filter(w=>!['archiwum','skompletowane'].includes(w.status));
+  wozki.sort((a,b)=>{if(a.pilny&&!b.pilny)return -1;if(!a.pilny&&b.pilny)return 1;return b.updatedAt-a.updatedAt;});
+
+  wozki.forEach(w=>{
+    w.operations.filter(op=>op.wymagana!==false&&mojeOpIds.has(op.id)).forEach(op=>{
+      const me=op.workers.find(x=>x.workerId===S.wkId);
+      const key=`${w.id}::${op.id}`;
+      if(op.status==='in-progress'&&me?.startTs)active.push({w,op,key});
+      else if(op.status==='paused'&&me)         paused.push({w,op,key});
+      else if(op.status==='idle')               available.push({w,op,key});
+    });
+  });
+
+  let html='';
+
+  // Aktywne
+  if(active.length){
+    html+=`<div class="section-title" style="color:var(--orange);">⏱ TERAZ ROBIĘ (${active.length})</div>`;
+    html+=active.map(({w,op,key})=>`
+      <div class="task-card running">
+        <div class="tc-row">
+          <div style="width:36px;height:36px;border-radius:8px;background:var(--ob);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">▶</div>
+          <div class="tc-info">
+            <div class="tc-op">${esc(op.name)}</div>
+            <div class="tc-wozek">${esc(w.vin)} · ${esc(w.model)}${w.pilny?' ⚡':''}</div>
+            <div class="tc-meta">${esc(getEtap(w).name)} · ${w.klasa==='silver'?'Srebro':'Brąz'}</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0;">
+            <div data-timer="${op.id}" data-wid="${w.id}" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:18px;color:var(--orange);">${fmtT(liveSecs(op))}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;padding:0 12px 10px;">
+          <button class="btn bs" style="flex:1;" onclick="taskPause('${w.id}','${op.id}')">⏸ PAUZA</button>
+          <button class="btn" style="flex:2;background:var(--green);color:#000;" onclick="taskStop('${w.id}','${op.id}')">✓ ZAKOŃCZ</button>
+        </div>
+      </div>`).join('');
+  }
+
+  // Na pauzie
+  if(paused.length){
+    html+=`<div class="section-title" style="color:var(--gold);margin-top:4px;">⏸ NA PAUZIE (${paused.length})</div>`;
+    html+=paused.map(({w,op,key})=>`
+      <div class="task-card" style="border-color:rgba(245,158,11,.4);">
+        <div class="tc-row">
+          <div style="width:36px;height:36px;border-radius:8px;background:var(--goldb);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">⏸</div>
+          <div class="tc-info">
+            <div class="tc-op">${esc(op.name)}</div>
+            <div class="tc-wozek">${esc(w.vin)} · ${esc(w.model)}</div>
+            <div class="tc-meta">${fmtT(liveSecs(op))} przepracowane</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;padding:0 12px 10px;">
+          <button class="btn" style="flex:1;background:var(--orange);color:#000;" onclick="taskStart('${w.id}','${op.id}')">▶ WZNÓW</button>
+          <button class="btn" style="flex:2;background:var(--green);color:#000;" onclick="taskStop('${w.id}','${op.id}')">✓ ZAKOŃCZ</button>
+        </div>
+      </div>`).join('');
+  }
+
+  // Dostępne — z checkboxami do pracy seryjnej
+  if(available.length){
+    html+=`<div class="section-title" style="margin-top:4px;">
+      DOSTĘPNE DLA MNIE (${available.length})
+      <button class="bgh bsm" onclick="toggleSerialMode()" id="serial-mode-btn">☑ ZAZNACZ</button>
+    </div>`;
+    html+=available.slice(0,30).map(({w,op,key})=>{
+      const checked=S.serialSel.has(key);
+      return`<div class="task-card ${w.pilny?'urgent':''}" id="tc-${key.replace('::','-')}">
+        <div class="tc-row">
+          <div class="tc-cb ${checked?'checked':''}" id="cb-${key.replace('::','-')}" onclick="toggleSerial('${key}','${w.id}','${op.id}')" style="${S.serialMode?'':'display:none;'}">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="tc-info" onclick="openDetail('${w.id}')" style="cursor:pointer;">
+            <div class="tc-op">${esc(op.name)}</div>
+            <div class="tc-wozek">${esc(w.vin)} · ${esc(w.model)}${w.pilny?' ⚡':''}</div>
+            <div class="tc-meta">${esc(getEtap(w).name)} · ${w.klasa==='silver'?'Srebro':'Brąz'}</div>
+          </div>
+          <button class="btn" style="flex-shrink:0;background:var(--orange);color:#000;padding:8px 12px;font-size:13px;font-family:'Barlow Condensed',sans-serif;font-weight:800;" onclick="taskStart('${w.id}','${op.id}')">▶ START</button>
+        </div>
+      </div>`;
+    }).join('');
+    if(available.length>30)html+=`<div style="text-align:center;padding:8px;color:var(--silver2);font-size:12px;">+${available.length-30} kolejnych zadań</div>`;
+  }
+
+  if(!active.length&&!paused.length&&!available.length){
+    const isPrzyjecie=(wk.role||[]).includes("przyjecie");html=`<div class="empty"><div class="empty-icon">${isPrzyjecie?"📋":"✅"}</div><div class="empty-txt">${isPrzyjecie?"Brak wózków do przyjęcia lub wydania.<br>Sprawdź LISTĘ.":"Brak zadań dla Twoich ról.<br>Sprawdź HALĘ lub LISTĘ."}</div></div>`;
+  }
+
+  body.innerHTML=html;
+
+  // Serial bar
+  updateSerialBar();
+}
+
+function renderMojeAdmin(){
+  document.getElementById('moje-greeting').innerHTML='Panel <span>Szefa</span>';
+  document.getElementById('moje-role').textContent='Pełny dostęp administratora';
+  const all=gWozki();
+  const s={t:all.length,nowe:0,praca:0,gotowe:0,kryzysy:0};
+  all.forEach(w=>{if(w.status==='nowe')s.nowe++;else if(w.status==='reanimacja')s.praca++;else if(w.status==='skompletowane')s.gotowe++;if(w.hasCrisis)s.kryzysy++;});
+  document.getElementById('moje-stats').innerHTML=`
+    <div class="moje-stat"><div class="ms-val">${s.nowe}</div><div class="ms-lbl">NOWE</div></div>
+    <div class="moje-stat"><div class="ms-val">${s.praca}</div><div class="ms-lbl">W PRACY</div></div>
+    <div class="moje-stat"><div class="ms-val">${s.gotowe}</div><div class="ms-lbl">GOTOWE</div></div>`;
+  const body=document.getElementById('moje-body');
+  body.innerHTML=`
+    <div style="padding:8px 12px;">
+      ${s.kryzysy?`<div style="background:var(--rb);border:1px solid rgba(232,51,74,.3);border-radius:10px;padding:12px;margin-bottom:10px;"><div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:14px;color:var(--red);">🚨 ${s.kryzysy} AKTYWNYCH KRYZYSÓW</div><button class="btn bs bsm" style="margin-top:6px;" onclick="navTo('lista')">PRZEJDŹ DO LISTY</button></div>`:''}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+        <button class="btn bp" style="padding:14px;" onclick="openAddWozek()">🚜 PRZYJMIJ WÓZEK</button>
+        <button class="btn bs" style="padding:14px;" onclick="openAdmin()">⚙️ PANEL SZEFA</button>
+        <button class="btn bs" style="padding:14px;" onclick="navTo('hala')">🏭 TABLICA HALI</button>
+        <button class="btn bs" style="padding:14px;" onclick="navTo('wyniki')">📊 WYNIKI</button>
+      </div>
+    </div>`;
+}
+
+// Serial mode
+function toggleSerialMode(){
+  S.serialMode=!S.serialMode;S.serialSel.clear();renderMoje();
+}
+function toggleSerial(key,wId,opId){
+  if(!S.serialMode){S.serialMode=true;}
+  if(S.serialSel.has(key))S.serialSel.delete(key);
+  else S.serialSel.add(key);
+  // Update just this card's checkbox
+  const cb=document.getElementById('cb-'+key.replace('::','-'));
+  if(cb)cb.classList.toggle('checked',S.serialSel.has(key));
+  updateSerialBar();
+}
+function updateSerialBar(){
+  const bar=document.getElementById('serial-bar');if(!bar)return;
+  if(S.serialSel.size>0){
+    bar.classList.add('show');
+    document.getElementById('serial-count').textContent=S.serialSel.size;
+  }else{
+    bar.classList.remove('show');
+  }
+}
+function startSerial(){
+  if(!S.serialSel.size)return;
+  const now=Date.now();let started=0;
+  S.serialSel.forEach(key=>{
+    const [wId,opId]=key.split('::');
+    const w=gWozek(wId);if(!w)return;
+    const op=w.operations.find(o=>o.id===opId);if(!op||op.status!=='idle')return;
+    let me=op.workers.find(x=>x.workerId===S.wkId);
+    if(!me){me={workerId:S.wkId,startTs:now,accSecs:0};op.workers.push(me);}
+    else me.startTs=now;
+    op.status='in-progress';op.startedAt=now;w.status='reanimacja';w.updatedAt=now;
+    sWozek(w);started++;
+  });
+  S.serialSel.clear();S.serialMode=false;
+  toast(`▶ Uruchomiono ${started} operacji`,'success');
+  renderMoje();updateCounts();
+}
+function stopSerial(){
+  if(!S.serialSel.size)return;
+  const now=Date.now();let stopped=0;
+  S.serialSel.forEach(key=>{
+    const [wId,opId]=key.split('::');
+    const w=gWozek(wId);if(!w)return;
+    const op=w.operations.find(o=>o.id===opId);if(!op)return;
+    op.workers.forEach(wk=>{if(wk.startTs){wk.accSecs=(wk.accSecs||0)+Math.floor((now-wk.startTs)/1000);wk.startTs=null;}});
+    op.totalSecs=op.workers.reduce((s,x)=>s+(x.accSecs||0),0);
+    op.status='done';op.completedAt=now;w.updatedAt=now;w.progress=calcProg(w);
+    sWozek(w);stopped++;
+  });
+  S.serialSel.clear();S.serialMode=false;
+  toast(`✓ Zakończono ${stopped} operacji`,'success');
+  renderMoje();updateCounts();
+}
+
+// Task actions
+function taskStart(wId,opId){
+  const w=gWozek(wId);if(!w)return;const op=w.operations.find(o=>o.id===opId);if(!op)return;
+  const now=Date.now();
+  let me=op.workers.find(x=>x.workerId===S.wkId);
+  if(!me){me={workerId:S.wkId,startTs:now,accSecs:0};op.workers.push(me);}
+  else me.startTs=now;
+  op.status='in-progress';op.startedAt=op.startedAt||now;w.status='reanimacja';w.updatedAt=now;
+  sWozek(w);toast('▶ '+op.name.slice(0,30),'info');renderMoje();updateCounts();
+}
+function taskPause(wId,opId){
+  const w=gWozek(wId);if(!w)return;const op=w.operations.find(o=>o.id===opId);if(!op)return;
+  const now=Date.now();
+  const me=op.workers.find(x=>x.workerId===S.wkId);
+  if(me?.startTs){me.accSecs=(me.accSecs||0)+Math.floor((now-me.startTs)/1000);me.startTs=null;}
+  if(!op.workers.some(x=>x.startTs&&x.workerId!==S.wkId)){
+    op.status='paused';op.totalSecs=op.workers.reduce((s,x)=>s+(x.accSecs||0),0);
+  }
+  w.updatedAt=now;sWozek(w);toast('⏸ Pauza','info');renderMoje();
+}
+function taskStop(wId,opId){
+  const w=gWozek(wId);if(!w)return;const op=w.operations.find(o=>o.id===opId);if(!op)return;
+  const now=Date.now();
+  op.workers.forEach(x=>{if(x.startTs){x.accSecs=(x.accSecs||0)+Math.floor((now-x.startTs)/1000);x.startTs=null;}});
+  op.totalSecs=op.workers.reduce((s,x)=>s+(x.accSecs||0),0);
+  op.status='done';op.completedAt=now;w.updatedAt=now;w.progress=calcProg(w);
+  // Auto-przejście do GOTOWE gdy 100%
+  if(w.progress===100&&w.status==='reanimacja'){w.status='skompletowane';toast('🏆 Wózek gotowy do wydania!','success');}
+  sWozek(w);toast('✓ '+op.name.slice(0,30),'success');renderMoje();updateCounts();
+}
+
+// ══════════════════════════════════════════════
+// HALA (KANBAN)
+// ══════════════════════════════════════════════
+function renderHala(){
+  const workers=gWorkers();
+  const wozki=gWozki().filter(w=>!['archiwum'].includes(w.status));
+  document.getElementById('kanban-body').innerHTML=ETAPY.map(etap=>{
+    const inn=wozki.filter(w=>getEtap(w).id===etap.id);
+    inn.sort((a,b)=>{if(a.pilny&&!b.pilny)return -1;if(!a.pilny&&b.pilny)return 1;return b.updatedAt-a.updatedAt;});
+    const cards=inn.map(w=>{
+      const pct=w.progress;
+      const act=new Set();w.operations.forEach(op=>{if(op.status==='in-progress')op.workers.forEach(wk=>{if(wk.startTs)act.add(wk.workerId);});});
+      const chips=[...act].map(id=>{const wk=workers.find(x=>x.id===id);return wk?`<span class="k-chip">${wk.initials}</span>`:''}).join('');
+      return`<div class="k-card ${w.pilny?'urgent':''} ${w.hasCrisis?'crisis':''}" onclick="openDetail('${w.id}')">
+        <div class="k-vin">${esc(w.vin)}${w.pilny?' ⚡':''}</div>
+        <div class="k-model">${esc(w.model)} · ${w.klasa==='silver'?'S':'B'}</div>
+        <div class="k-prog-track"><div class="k-prog-fill ${pct===100?'done':''}" style="width:${pct}%"></div></div>
+        ${chips?`<div class="k-chips">${chips}</div>`:''}
+      </div>`;
+    }).join('');
+    return`<div class="k-col">
+      <div class="k-hdr" style="border-top:3px solid ${etap.color};">
+        <div class="k-title" style="color:${etap.color};">${etap.name}</div>
+        <div class="k-count">${inn.length} wózków</div>
+      </div>
+      <div class="k-body">${cards||`<div style="padding:10px;text-align:center;color:var(--silver2);font-size:11px;">Brak</div>`}</div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════
+// LISTA
+// ══════════════════════════════════════════════
+function setFilter(f){
+  S.filter=f;['nowe','reanimacja','skompletowane','archiwum'].forEach(x=>{const el=document.getElementById('tab-'+x);if(el)el.classList.toggle('on',x===f);});
+  document.getElementById('fab').style.display=(S.isAdmin&&f!=='archiwum')?'flex':'none';
+  renderLista();
+}
+function clearSearch(){document.getElementById('search-in').value='';document.getElementById('search-x').style.display='none';renderLista();}
+function renderLista(){
+  const q=(document.getElementById('search-in')?.value||'').trim().toLowerCase();
+  const xBtn=document.getElementById('search-x');if(xBtn)xBtn.style.display=q?'block':'none';
+  let list=gWozki().filter(w=>w.status===S.filter);
+  if(q)list=list.filter(w=>w.vin.toLowerCase().includes(q)||w.model.toLowerCase().includes(q));
+  list.sort((a,b)=>{if(a.hasCrisis&&!b.hasCrisis)return -1;if(!a.hasCrisis&&b.hasCrisis)return 1;if(a.pilny&&!b.pilny)return -1;if(!a.pilny&&b.pilny)return 1;return b.updatedAt-a.updatedAt;});
+  const workers=gWorkers();const el=document.getElementById('lista-body');
+  if(!list.length){el.innerHTML=`<div class="empty"><div class="empty-icon">${q?'🔍':'🚜'}</div><div class="empty-txt">${q?`Brak wyników dla "${q}"`:S.filter==='archiwum'?'Archiwum puste.':'Brak wózków w tej kategorii.'}</div></div>`;updateCounts();return;}
+  el.innerHTML=list.map(w=>{
+    const pct=w.progress;const etap=getEtap(w);
+    const act=new Set();w.operations.forEach(op=>{if(op.status==='in-progress')op.workers.forEach(wk=>{if(wk.startTs)act.add(wk.workerId);});});
+    const chips=[...act].map(id=>{const wk=workers.find(x=>x.id===id);return wk?`<span class="wchip-sm on">${wk.initials}</span>`:''}).join('')||`<span style="font-size:10px;color:var(--silver2);font-style:italic;">brak aktywnych</span>`;
+    const myWk=gWorker(S.wkId);const isMine=myWk&&(myWk.myWozki||[]).includes(w.id);
+    const thumb=w.photoWozek?`<img src="${w.photoWozek}" class="wc-photo">`:`<div class="wc-photo-ph"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--silver2)" stroke-width="1.5"><rect x="2" y="6" width="20" height="14" rx="2"/><circle cx="12" cy="13" r="3"/></svg></div>`;
+    const adminBtns=S.isAdmin?`
+      <button class="wc-btn" onclick="event.stopPropagation();qTog('${w.id}','pilny')" style="background:${w.pilny?'var(--rb)':'rgba(110,110,122,.1)'};color:${w.pilny?'var(--red)':'var(--silver2)'};border:1px solid ${w.pilny?'rgba(232,51,74,.4)':'rgba(110,110,122,.2)'};">⚡${w.pilny?'PILNY':'PILNY?'}</button>
+      <button class="wc-btn" onclick="event.stopPropagation();qTog('${w.id}','jezdny')" style="background:${w.jezdny?'var(--gb)':'var(--rb)'};color:${w.jezdny?'var(--green)':'var(--red)'};border:1px solid ${w.jezdny?'rgba(34,197,94,.3)':'rgba(232,51,74,.3)'};">🚗${w.jezdny?'JEDZIE':'NIE JEDZIE'}</button>
+      ${w.status==='skompletowane'?`<button class="wc-btn" onclick="event.stopPropagation();archiveWozek('${w.id}')" style="background:rgba(110,110,122,.1);color:var(--silver2);border:1px solid rgba(110,110,122,.2);">📁 ARCH</button>`:''}
+      ${w.status==='archiwum'?`<button class="wc-btn" onclick="event.stopPropagation();unarchiveWozek('${w.id}')" style="background:rgba(110,110,122,.1);color:var(--silver2);border:1px solid rgba(110,110,122,.2);">↩ PRZYWRÓĆ</button>`:''}
+    `:'';
+    const mineBtn=S.wkId?`<button class="wc-btn" onclick="event.stopPropagation();toggleMineCard('${w.id}')" style="background:${isMine?'var(--bb)':'rgba(110,110,122,.1)'};color:${isMine?'var(--blue)':'var(--silver2)'};border:1px solid ${isMine?'rgba(59,130,246,.4)':'rgba(110,110,122,.2)'};">${isMine?'★ MOJE':'☆ DODAJ'}</button>`:'';
+    return`<div class="wcard ${w.hasCrisis?'crisis':w.pilny?'urgent':isMine?'mine':''}" onclick="openDetail('${w.id}')">
+      <div class="wc-top">${thumb}<div class="wc-info">
+        <div class="wc-r1"><span class="wc-vin">${esc(w.vin)}</span><span class="wc-model">${esc(w.model)}</span></div>
+        <div class="wc-r2">
+          ${w.klasa==='silver'?'<span class="badge b-silver">SREBRO</span>':'<span class="badge b-bronze">BRĄZ</span>'}
+          ${w.budowa==='kabina'?'<span class="badge" style="background:var(--bb);color:var(--blue);border:1px solid rgba(59,130,246,.25);">KABINA</span>':'<span class="badge" style="background:rgba(110,110,122,.15);color:var(--silver2);border:1px solid rgba(110,110,122,.3);">BEZ KABINY</span>'}
+          <span class="badge b-etap" style="background:${etap.color}18;color:${etap.color};border-color:${etap.color}44;">${etap.name}</span>
+          ${w.hasCrisis?'<span class="badge b-crisis">🚨</span>':''}
+          ${w.pilny?'<span class="badge b-urgent">⚡PILNY</span>':''}
+          ${isMine?'<span class="badge b-mine">★</span>':''}
+          ${w.bateria==='brak'?'<span class="badge" style="background:var(--rb);color:var(--red);border:1px solid rgba(232,51,74,.3);">BEZ BAT.</span>':''}
+          ${w.karetka===false?'<span class="badge" style="background:rgba(110,110,122,.15);color:var(--silver2);border:1px solid rgba(110,110,122,.3);">BEZ WIDEŁ</span>':''}
+          ${!w.jezdny?'<span class="badge" style="background:var(--rb);color:var(--red);border:1px solid rgba(232,51,74,.3);">🚗NIE JEDZIE</span>':''}
+          ${!w.podnosi?'<span class="badge" style="background:var(--rb);color:var(--red);border:1px solid rgba(232,51,74,.3);">⬆️NIE PODNOSI</span>':''}
+        </div>
+      </div></div>
+      <div class="wc-prog">
+        <div class="prog-meta"><span class="prog-lbl">POSTĘP RENOWACJI</span><span class="prog-pct ${pct===100?'done':''}">${pct}%</span></div>
+        <div class="prog-track"><div class="prog-fill ${pct===100?'done':''}" style="width:${pct}%"></div></div>
+      </div>
+      <div class="wc-workers"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--silver2)" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0 1 12 0v2"/></svg> ${chips}</div>
+      <div class="wc-actions">${adminBtns}${mineBtn}</div>
+    </div>`;
+  }).join('');
+  updateCounts();
+}
+function updateCounts(){
+  const a=gWozki();
+  ['nowe','reanimacja','skompletowane','archiwum'].forEach(s=>{const el=document.getElementById('fc-'+s);if(el)el.textContent=a.filter(w=>w.status===s).length;});
+}
+function qTog(id,field){const w=gWozek(id);if(!w)return;w[field]=!w[field];w.updatedAt=Date.now();sWozek(w);renderLista();toast(w[field]?'✓':'✗','info');}
+function archiveWozek(id){const w=gWozek(id);if(!w)return;w.status='archiwum';w.updatedAt=Date.now();sWozek(w);renderLista();toast('📁 Archiwum','info');}
+function unarchiveWozek(id){const w=gWozek(id);if(!w)return;w.status='skompletowane';w.updatedAt=Date.now();sWozek(w);renderLista();toast('↩ Przywrócono','info');}
+function toggleMineCard(wId){
+  if(!S.wkId)return;const workers=gWorkers();const idx=workers.findIndex(w=>w.id===S.wkId);if(idx<0)return;
+  if(!workers[idx].myWozki)workers[idx].myWozki=[];
+  const mIdx=workers[idx].myWozki.indexOf(wId);
+  if(mIdx>=0){workers[idx].myWozki.splice(mIdx,1);toast('Usunięto z Moich','info');}
+  else{workers[idx].myWozki.push(wId);toast('★ Dodano do Moich','success');}
+  sWorkers(workers);renderLista();refreshMineBtn();
+}
+// ══════════════════════════════════════════════
+// WYNIKI (statystyki)
+// ══════════════════════════════════════════════
+function renderWyniki(){
+  const workers=gWorkers();const wozki=gWozki();
+  const todayTs=new Date().setHours(0,0,0,0);
+  const {hourlyRate=75}=gSet();
+  const stats=workers.map(wk=>{
+    let dzOps=0,dzSecs=0,allOps=0,allSecs=0;
+    wozki.forEach(w=>w.operations.forEach(op=>{
+      const e=op.workers.find(x=>x.workerId===wk.id);if(!e)return;
+      allOps++;allSecs+=(e.accSecs||0);
+      if(op.completedAt&&op.completedAt>=todayTs){dzOps++;dzSecs+=(e.accSecs||0);}
+    }));
+    return{wk,dzOps,dzSecs,allOps,allSecs};
+  }).sort((a,b)=>b.dzOps-a.dzOps);
+  const top=stats.slice(0,3);const RNK=[{l:'🥇',c:'gold'},{l:'🥈',c:'silver-p'},{l:'🥉',c:'bronze-p'}];
+  let html=`<div class="section-title" style="padding:12px 12px 5px;">DZISIEJSZY RANKING</div>
+  <div class="podium">${top.map((s,i)=>`<div class="podium-card ${RNK[i]?.c||''}">
+    <div style="font-size:20px;margin-bottom:4px;">${RNK[i]?.l||''}</div>
+    <div class="pod-av" style="background:${wColor(s.wk.id)};">${s.wk.initials}</div>
+    <div class="pod-name">${esc(s.wk.name.split(' ')[0])}</div>
+    <div class="pod-val">${s.dzOps}</div><div class="pod-lbl">operacji dziś</div>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:11px;color:var(--silver2);margin-top:2px;">${fmtT(s.dzSecs)}</div>
+  </div>`).join('')}</div>
+  <div class="section-title" style="padding:10px 12px 5px;">WSZYSCY PRACOWNICY</div>`;
+  html+=stats.map((s,i)=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:9px;padding:10px 12px;display:flex;align-items:center;gap:10px;margin:0 8px 4px;">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:15px;color:var(--silver2);width:22px;">#${i+1}</div>
+    <div style="width:34px;height:34px;border-radius:8px;background:${wColor(s.wk.id)};display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:14px;color:#fff;">${s.wk.initials}</div>
+    <div style="flex:1;"><div style="font-weight:600;font-size:13px;">${esc(s.wk.name)}</div><div style="font-size:11px;color:var(--silver2);">${s.allOps} op. · ${fmtT(s.allSecs)} łącznie</div></div>
+    <div style="text-align:right;"><div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:18px;color:var(--orange);">${s.dzOps}</div><div style="font-size:10px;color:var(--silver2);">dziś</div></div>
+  </div>`).join('');
+  if(S.isAdmin){
+    const ts=wozki.reduce((s,w)=>s+w.operations.reduce((t,o)=>t+(o.totalSecs||0),0),0);
+    const m=wozki.reduce((s,w)=>s+(w.materials||[]).reduce((t,x)=>t+(parseFloat(x.cost)||0),0),0);
+    const l=(ts/3600)*hourlyRate;
+    html+=`<div class="section-title" style="padding:12px 12px 5px;">FINANSE ŁĄCZNIE</div>
+    <div style="padding:0 8px;">
+      <div class="fin-grid" style="margin-bottom:6px;">
+        <div class="fin-card"><div class="fin-lbl">💪 ROBOCIZNA</div><div class="fin-val">${l.toFixed(0)} zł</div></div>
+        <div class="fin-card"><div class="fin-lbl">📦 MATERIAŁY</div><div class="fin-val">${m.toFixed(0)} zł</div></div>
+      </div>
+      <div class="fin-card" style="border-color:var(--orange);margin-bottom:6px;"><div class="fin-lbl">💰 ŁĄCZNE KOSZTY</div><div class="fin-val big">${(l+m).toFixed(2)} zł</div></div>
+      <button class="btn bs" style="width:100%;" onclick="exportCSV()">📊 EKSPORTUJ CSV</button>
+    </div>`;
+  }
+  document.getElementById('wyniki-body').innerHTML=html;
+}
+
+// ══════════════════════════════════════════════
+// KARTA WÓZKA (detail) — jeden ekran, bez zakładek
+// ══════════════════════════════════════════════
+function openDetail(id){
+  S.detailId=id;const w=gWozek(id);if(!w)return;
+  document.getElementById('d-vin').textContent=w.vin;
+  document.getElementById('d-model').textContent=`${w.model} · ${w.klasa==='silver'?'Srebro':'Brąz'}`;
+  document.getElementById('d-edit-btn').style.display=S.isAdmin?'flex':'none';
+  const myWk=gWorker(S.wkId);const isMine=myWk&&(myWk.myWozki||[]).includes(id);
+  const mineBtn=document.getElementById('d-mine-btn');
+  mineBtn.style.display=S.wkId?'inline-flex':'none';
+  mineBtn.textContent=isMine?'★ W MOICH':'☆ MOJE';
+  mineBtn.style.cssText=isMine?'display:inline-flex;background:var(--bb);border:1px solid rgba(59,130,246,.4);border-radius:6px;padding:3px 8px;font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:10px;color:var(--blue);cursor:pointer;':'display:inline-flex;background:none;border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:10px;color:var(--silver2);cursor:pointer;';
+  refreshDH(w);renderDetailBody(w);
+  document.getElementById('screen-detail').classList.add('open');
+}
+function closeDetail(){
+  document.getElementById('screen-detail').classList.remove('open');S.detailId=null;
+  if(S.view==='moje')renderMoje();
+  else if(S.view==='lista')renderLista();
+  else if(S.view==='hala')renderHala();
+}
+function refreshDH(w){
+  const pct=w.progress;const etap=getEtap(w);
+  document.getElementById('d-pct').textContent=`${pct}%`;
+  document.getElementById('d-pct').className=`dh-pct${pct===100?' done':''}`;
+  document.getElementById('d-bar').style.width=`${pct}%`;
+  document.getElementById('d-bar').className=`prog-fill${pct===100?' done':''}`;
+  document.getElementById('d-badges').innerHTML=[
+    w.klasa==='silver'?'<span class="badge b-silver">SREBRO</span>':'<span class="badge b-bronze">BRĄZ</span>',
+    `<span class="badge b-etap" style="background:${etap.color}18;color:${etap.color};border-color:${etap.color}44;">${etap.name}</span>`,
+    w.budowa==='kabina'?'<span class="badge" style="background:var(--bb);color:var(--blue);border:1px solid rgba(59,130,246,.25);">KABINA</span>':'',
+    // Bateria — wyraźna informacja gdy brak
+    w.bateria==='brak'?'<span class="badge" style="background:var(--rb);color:var(--red);border:1px solid rgba(232,51,74,.4);">BEZ BATERII</span>':
+    w.bateria?`<span class="badge" style="background:var(--panel);color:var(--silver);border:1px solid var(--border);">${w.bateria.toUpperCase()}</span>`:'',
+    // Karetka — tylko gdy NIE MA
+    w.karetka===false?'<span class="badge" style="background:rgba(110,110,122,.15);color:var(--silver2);border:1px solid rgba(110,110,122,.3);">BEZ WIDEŁ</span>':'',
+    w.pilny?'<span class="badge b-urgent">⚡PILNY</span>':'',
+    w.hasCrisis?'<span class="badge b-crisis">🚨KRYZYS</span>':'',
+    !w.jezdny?'<span class="badge" style="background:var(--rb);color:var(--red);border:1px solid rgba(232,51,74,.3);">NIE JEDZIE</span>':'',
+    !w.podnosi?'<span class="badge" style="background:var(--rb);color:var(--red);border:1px solid rgba(232,51,74,.3);">NIE PODNOSI</span>':'',
+    w.status==='archiwum'?'<span class="badge" style="background:rgba(110,110,122,.15);color:var(--silver2);border:1px solid rgba(110,110,122,.3);">📁 ARCHIWUM</span>':'',
+  ].filter(Boolean).join('');
+}
+function refreshMineBtn(){
+  const btn=document.getElementById('d-mine-btn');if(!btn||!S.detailId)return;
+  const myWk=gWorker(S.wkId);const isMine=myWk&&(myWk.myWozki||[]).includes(S.detailId);
+  btn.textContent=isMine?'★ W MOICH':'☆ MOJE';
+  btn.style.cssText=isMine?'display:inline-flex;background:var(--bb);border:1px solid rgba(59,130,246,.4);border-radius:6px;padding:3px 8px;font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:10px;color:var(--blue);cursor:pointer;':'display:inline-flex;background:none;border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:10px;color:var(--silver2);cursor:pointer;';
+}
+function toggleMine(){if(S.detailId)toggleMineCard(S.detailId);}
+
+// ── RENDER DETAIL BODY ── jeden przewijalny ekran
+function renderDetailBody(w){
+  if(!w)w=gWozek(S.detailId);if(!w)return;
+  const workers=gWorkers();
+  const GRPS=['PRZYGOTOWANIE','MYJNIA','SZLIFOWANIE','OKLEJANIE','BLACHARSTWO','KOŁA','MALOWANIE','PLASTIKI','MONTAŻ','WYDANIE'];
+  const req=w.operations.filter(o=>o.wymagana!==false);
+  const skip=w.operations.filter(o=>o.wymagana===false);
+
+  // Historia prac
+  let histHTML='';
+  const grps={};req.forEach(o=>{if(!grps[o.group])grps[o.group]=[];grps[o.group].push(o);});
+  GRPS.filter(g=>grps[g]).forEach(g=>{
+    const ops=grps[g];
+    histHTML+=`<div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:10px;letter-spacing:.1em;color:var(--silver2);text-transform:uppercase;padding:8px 0 4px;">${g}</div>`;
+    ops.forEach(op=>{
+      const secs=liveSecs(op);
+      const whoNames=op.workers.map(wk=>{const x=workers.find(y=>y.id===wk.workerId);return x?x.initials:'?';}).filter(Boolean).join(', ')||'—';
+      const icon=op.status==='done'?'✓':op.status==='in-progress'?'▶':op.status==='paused'?'⏸':'○';
+      const icls=op.status==='done'?'hr-done':op.status==='in-progress'?'hr-active':'hr-idle';
+      // Action buttons
+      let actionBtn='';
+      if(op.status==='idle'||op.status==='paused'){
+        actionBtn=`<button onclick="detailOpStart('${op.id}')" style="background:var(--green);color:#000;border:none;border-radius:6px;padding:4px 10px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;cursor:pointer;white-space:nowrap;">▶ START</button>`;
+      }else if(op.status==='in-progress'){
+        actionBtn=`<button onclick="detailOpStop('${op.id}')" style="background:var(--red);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;cursor:pointer;white-space:nowrap;">✓ STOP</button>`;
+      }else if(op.status==='done'&&S.isAdmin){
+        actionBtn=`<button onclick="detailOpReopen('${op.id}')" style="background:var(--panel);color:var(--silver2);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:10px;cursor:pointer;">↩</button>`;
+      }
+      histHTML+=`<div class="history-row">
+        <div class="hr-icon ${icls}">${icon}</div>
+        <div class="hr-info">
+          <div class="hr-name" style="${op.status==='done'?'text-decoration:line-through;color:var(--silver2);':''}">${esc(op.name)}</div>
+          <div class="hr-who">${op.status!=='idle'?whoNames:''}</div>
+        </div>
+        ${secs>0?`<div class="hr-time">${fmtT(secs)}</div>`:''}
+        ${actionBtn}
+      </div>`;
+    });
+  });
+  if(skip.length){
+    histHTML+=`<div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:10px;color:var(--silver2);padding:6px 0 3px;opacity:.6;">POMINIĘTE (${skip.length})</div>`;
+    skip.forEach(op=>{histHTML+=`<div class="history-row" style="opacity:.4;"><div class="hr-icon hr-idle">—</div><div class="hr-info"><div class="hr-name" style="text-decoration:line-through;">${esc(op.name)}</div></div></div>`;});
+  }
+
+  // Materiały
+  const mats=w.materials||[];
+  let matsHTML=mats.length?mats.map((m,i)=>`<div class="mat-row">
+    <div class="mat-name">${esc(m.name)}</div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;">
+      <span class="mat-qty">${esc(m.qty||'')}</span>
+      ${m.workerId?`<span class="mat-who">${gWorker(m.workerId)?.initials||'?'}</span>`:''}
+      ${S.isAdmin&&m.cost?`<span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;color:var(--orange);">${parseFloat(m.cost).toFixed(2)} zł</span>`:''}
+    </div>
+    <button onclick="removeMat(${i})" style="background:none;border:none;color:var(--silver2);cursor:pointer;padding:4px;font-size:14px;">✕</button>
+  </div>`).join(''):
+  `<div style="font-size:13px;color:var(--silver2);padding:8px 0;">Brak pobranych materiałów</div>`;
+
+  // Pakiety
+  const paks=gPak().filter(p=>p.modele.includes(w.model)&&(p.klasa==='both'||p.klasa===w.klasa));
+  let pakHTML='';
+  if(paks.length){
+    pakHTML=`<div style="margin-top:8px;"><div style="font-size:11px;color:var(--silver2);margin-bottom:5px;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.06em;">PAKIET BAZOWY</div>`;
+    pakHTML+=paks.map(p=>`<button onclick="zastosujPakiet('${p.id}')" style="background:var(--ob2);border:1px solid rgba(255,107,0,.3);border-radius:8px;padding:8px 12px;width:100%;text-align:left;cursor:pointer;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between;">
+      <div><div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:var(--orange);">${esc(p.nazwa)}</div><div style="font-size:11px;color:var(--silver2);">${p.produkty.length} produktów</div></div>
+      <span style="color:var(--orange);font-size:18px;">+</span>
+    </button>`).join('');
+    pakHTML+='</div>';
+  }
+
+  // Notatki
+  const notes=w.notes||[];
+  let notesHTML=notes.length?notes.map(n=>{
+    const wk=n.workerId?gWorker(n.workerId):null;
+    return`<div class="note-row">
+      <div class="note-av" style="background:${wk?wColor(wk.id):'var(--border)'}">${wk?wk.initials:'⚙'}</div>
+      <div class="note-content">
+        <div class="note-who">${wk?esc(wk.name):'System'} · ${fmtD(n.ts)}</div>
+        <div class="note-txt">${esc(n.text)}</div>
+      </div>
+    </div>`;
+  }).join(''):
+  `<div style="font-size:13px;color:var(--silver2);padding:8px 0;">Brak notatek</div>`;
+
+  // Kryzysy
+  const crises=w.crisisLogs||[];
+  let crisHTML=crises.filter(c=>!c.resolved).map(c=>`<div class="crisis-row">
+    <div class="cr-type">${c.type.replace(/-/g,' ')}</div>
+    <div class="cr-desc">${esc(c.desc)}</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
+      <span style="font-size:10px;color:var(--silver2);">${fmtD(c.ts)}</span>
+      <button onclick="resolveCrisis('${c.id}')" style="background:none;border:1px solid rgba(34,197,94,.4);border-radius:6px;padding:3px 8px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:10px;color:var(--green);cursor:pointer;">✓ ROZWIĄZANE</button>
+    </div>
+  </div>`).join('');
+  const resolvedCrises=crises.filter(c=>c.resolved);
+  if(resolvedCrises.length)crisHTML+=`<div style="font-size:11px;color:var(--silver2);margin-top:4px;">+ ${resolvedCrises.length} rozwiązanych</div>`;
+
+  // Zdjęcia
+  // Zdjęcia — VIN osobno, reszta z lightboxem
+  const wozekPhotos=[];
+  if(w.photoWozek)wozekPhotos.push({src:w.photoWozek,label:'Przyjęcie'});
+  (w.workPhotos||[]).forEach((p,i)=>wozekPhotos.push({src:p.src,label:p.label||`Zdjęcie ${i+1}`}));
+  const allPhotos=[...wozekPhotos];if(w.photoVin)allPhotos.push({src:w.photoVin,label:'Tabliczka VIN'});
+
+  let photosHTML=wozekPhotos.map(p=>`<div style="position:relative;aspect-ratio:4/3;border-radius:8px;overflow:hidden;background:var(--panel);border:1px solid var(--border);cursor:pointer;" onclick="openLightbox('${p.src}','${esc(p.label)}')">
+    <img src="${p.src}" style="width:100%;height:100%;object-fit:cover;">
+    <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.65);color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:10px;padding:3px 6px;">${esc(p.label)}</div>
+  </div>`).join('');
+  // Przycisk dodaj zdjęcie wózka (bez limitu)
+  photosHTML+=`<div style="position:relative;aspect-ratio:4/3;border-radius:8px;border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--silver2);font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:11px;cursor:pointer;">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="6" width="20" height="14" rx="2"/><circle cx="12" cy="13" r="3"/><path d="M8 6l2-3h4l2 3"/></svg>
+    <span>📷 Dodaj zdjęcie</span>
+    <input type="file" accept="image/*" style="position:absolute;inset:0;opacity:0;cursor:pointer;" onchange="addWorkPhoto(this)">
+  </div>`;
+  // VIN osobno
+  const vinHTML=w.photoVin?`<div style="margin-top:6px;"><div style="font-size:10px;color:var(--silver2);font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.06em;margin-bottom:3px;">TABLICZKA VIN</div>
+    <div style="position:relative;border-radius:8px;overflow:hidden;background:var(--panel);border:1px solid var(--border);cursor:pointer;" onclick="openLightbox('${w.photoVin}','Tabliczka VIN')">
+      <img src="${w.photoVin}" style="width:100%;max-height:120px;object-fit:cover;">
+    </div>
+  </div>`:'';
+
+  // Finanse (tylko admin)
+  let finHTML='';
+  if(S.isAdmin){
+    const {hourlyRate=75}=gSet();
+    const wt={};w.operations.forEach(op=>op.workers.forEach(wk=>{if(!wt[wk.workerId])wt[wk.workerId]=0;wt[wk.workerId]+=(wk.accSecs||0);if(wk.startTs&&op.status==='in-progress')wt[wk.workerId]+=Math.floor((Date.now()-wk.startTs)/1000);}));
+    const ts=Object.values(wt).reduce((a,b)=>a+b,0);const l=(ts/3600)*hourlyRate;const m=(w.materials||[]).reduce((s,x)=>s+(parseFloat(x.cost)||0),0);
+    finHTML=`<div class="card-section">
+      <div class="cs-title">💰 KOSZTY</div>
+      <div class="fin-grid" style="margin-bottom:6px;">
+        <div class="fin-card"><div class="fin-lbl">⏱ CZAS</div><div class="fin-val">${fmtT(ts)}</div></div>
+        <div class="fin-card"><div class="fin-lbl">💪 ROBOCIZNA</div><div class="fin-val">${l.toFixed(0)} zł</div></div>
+        <div class="fin-card"><div class="fin-lbl">📦 MATERIAŁY</div><div class="fin-val">${m.toFixed(0)} zł</div></div>
+        <div class="fin-card" style="border-color:var(--orange);"><div class="fin-lbl">💰 ŁĄCZNIE</div><div class="fin-val">${(l+m).toFixed(2)} zł</div></div>
+      </div>
+      ${Object.entries(wt).map(([wId,secs])=>{if(secs<1)return'';const wk=workers.find(x=>x.id===wId);if(!wk)return'';return`<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);"><div style="width:26px;height:26px;border-radius:6px;background:${wColor(wId)};display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:10px;color:#fff;">${wk.initials}</div><div style="flex:1;font-size:12px;">${esc(wk.name)}</div><div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;color:var(--orange);">${fmtT(secs)} · ${((secs/3600)*hourlyRate).toFixed(0)} zł</div></div>`;}).join('')}
+    </div>`;
+  }
+
+  // Admin actions
+  const adminActions=S.isAdmin?`
+    <div style="display:flex;gap:6px;margin-bottom:16px;">
+      <button class="btn bs bsm" onclick="openEditWozek()">✏️ EDYTUJ</button>
+      ${w.status==='skompletowane'?`<button class="btn bs bsm" onclick="archiveWozek('${w.id}');closeDetail()">📁 ARCHIWUM</button>`:''}
+      ${w.status==='archiwum'?`<button class="btn bs bsm" onclick="unarchiveWozek('${w.id}');closeDetail()">↩ PRZYWRÓĆ</button>`:''}
+      <button class="btn bs bsm" onclick="printWozek()">🖨️ DRUKUJ</button>
+      ${!w.pilny?`<button class="btn bs bsm" onclick="qTog2('pilny')">⚡ PILNY</button>`:
+        `<button class="btn bd bsm" onclick="qTog2('pilny')">⚡ ODZNACZ</button>`}
+    </div>`:'';
+
+  document.getElementById('detail-body').innerHTML=`
+    ${w.notatka?`<div style="background:var(--goldb);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:13px;"><span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:10px;color:var(--gold);letter-spacing:.06em;">📝 NOTATKA PRZY PRZYJĘCIU</span><br>${esc(w.notatka)}</div>`:''}
+    ${adminActions}
+    <div class="card-section">
+      <div class="cs-title">HISTORIA PRAC <span style="font-size:10px;font-weight:400;color:var(--silver2);">${req.filter(o=>o.status==='done').length}/${req.length} ukończonych</span></div>
+      ${histHTML}
+    </div>
+    <div class="card-section">
+      <div class="cs-title">📦 MATERIAŁY <button class="bgh bsm" onclick="openMatModal()">+ POBIERZ</button></div>
+      ${matsHTML}
+      ${pakHTML}
+    </div>
+    <div class="card-section">
+      <div class="cs-title">💬 NOTATKI <button class="bgh bsm" onclick="openNoteModal()">+ DODAJ</button></div>
+      ${notesHTML}
+    </div>
+    ${crises.length||true?`<div class="card-section">
+      <div class="cs-title">🚨 PROBLEMY</div>
+      ${crisHTML||'<div style="font-size:13px;color:var(--silver2);padding:8px 0;">Brak aktywnych problemów ✅</div>'}
+    </div>`:''}
+    <div class="card-section">
+      <div class="cs-title">📷 ZDJĘCIA <span style="font-size:10px;font-weight:400;color:var(--silver2);">${wozekPhotos.length} zdjęć wózka</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">${photosHTML}</div>
+      ${vinHTML}
+    </div>
+    ${finHTML}
+    <button onclick="openCrisis()" style="background:var(--red);color:#fff;border:none;border-radius:12px;padding:14px;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:14px;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 20px rgba(232,51,74,.4);margin-top:8px;">🚨 ZGŁOŚ PROBLEM / AWARIĘ</button>
+  `;
+}
+
+// Akcje na operacjach z karty
+function detailOpStart(opId){
+  const w=gWozek(S.detailId);if(!w)return;const op=w.operations.find(o=>o.id===opId);if(!op)return;
+  const now=Date.now();
+  let me=op.workers.find(x=>x.workerId===S.wkId);
+  if(S.wkId){if(!me){me={workerId:S.wkId,startTs:now,accSecs:0};op.workers.push(me);}else me.startTs=now;}
+  else if(!op.workers.length){toast('Zaloguj się lub przypisz pracownika','error');return;}
+  else op.workers.forEach(wk=>{if(!wk.startTs)wk.startTs=now;});
+  op.status='in-progress';op.startedAt=op.startedAt||now;w.status='reanimacja';w.updatedAt=now;
+  sWozek(w);refreshDH(w);renderDetailBody(w);toast('▶ '+op.name.slice(0,28),'info');updateCounts();
+}
+function detailOpStop(opId){
+  const w=gWozek(S.detailId);if(!w)return;const op=w.operations.find(o=>o.id===opId);if(!op)return;
+  const now=Date.now();
+  op.workers.forEach(x=>{if(x.startTs){x.accSecs=(x.accSecs||0)+Math.floor((now-x.startTs)/1000);x.startTs=null;}});
+  op.totalSecs=op.workers.reduce((s,x)=>s+(x.accSecs||0),0);op.status='done';op.completedAt=now;
+  w.updatedAt=now;w.progress=calcProg(w);sWozek(w);refreshDH(w);renderDetailBody(w);toast('✓ '+op.name.slice(0,28),'success');updateCounts();
+}
+function detailOpReopen(opId){
+  const w=gWozek(S.detailId);if(!w)return;const op=w.operations.find(o=>o.id===opId);if(!op)return;
+  op.status='paused';op.completedAt=null;w.updatedAt=Date.now();sWozek(w);renderDetailBody(w);toast('↩ Cofnięto','info');
+}
+function qTog2(field){
+  const w=gWozek(S.detailId);if(!w||!S.isAdmin)return;w[field]=!w[field];w.updatedAt=Date.now();sWozek(w);refreshDH(w);renderDetailBody(w);toast(w[field]?`✓ ${field}`:`✗ ${field}`,'info');
+}
+
+// Notatka
+function openNoteModal(){document.getElementById('note-txt').value='';showM('m-note');}
+function saveNote(){
+  const txt=document.getElementById('note-txt').value.trim();if(!txt){toast('Wpisz notatkę!','error');return;}
+  const w=gWozek(S.detailId);if(!w)return;
+  if(!w.notes)w.notes=[];
+  w.notes.push({id:`n_${Date.now()}`,workerId:S.wkId||null,text:txt,ts:Date.now()});
+  w.updatedAt=Date.now();sWozek(w);closeById('m-note');renderDetailBody(w);toast('💬 Notatka dodana','success');
+}
+
+// Kryzys
+function openCrisis(){document.getElementById('cr-desc').value='';showM('m-crisis');}
+function saveCrisis(){
+  const desc=document.getElementById('cr-desc').value.trim();if(!desc){toast('Opisz problem!','error');return;}
+  const type=document.getElementById('cr-type').value;const w=gWozek(S.detailId);if(!w)return;
+  w.hasCrisis=true;w.crisisLogs.push({id:`cr_${Date.now()}`,type,desc,ts:Date.now(),resolved:false});
+  if(!w.notes)w.notes=[];w.notes.push({id:`n_${Date.now()}`,workerId:S.wkId||null,text:`🚨 ${type.replace(/-/g,' ').toUpperCase()}: ${desc}`,ts:Date.now()});
+  w.updatedAt=Date.now();sWozek(w);
+  const ch=gSet().ntfyChannel;if(ch)fetch(`https://ntfy.sh/${ch}`,{method:'POST',headers:{'Title':`🚨 ${w.vin}`,'Tags':'rotating_light','Priority':'4'},body:`${type}: ${desc}`}).catch(()=>{});
+  closeById('m-crisis');renderDetailBody(w);refreshDH(w);renderLista();toast('🚨 Problem zgłoszony!','error');
+}
+function resolveCrisis(id){
+  const w=gWozek(S.detailId);if(!w)return;const c=w.crisisLogs.find(x=>x.id===id);if(c)c.resolved=true;
+  if(w.crisisLogs.every(x=>x.resolved)){w.hasCrisis=false;}
+  w.updatedAt=Date.now();sWozek(w);renderDetailBody(w);toast('✓ Rozwiązano','success');
+}
+
+// Materiały
+function openMatModal(){
+  S.matWozekId=S.detailId;const w=gWozek(S.detailId);if(!w)return;
+  // Pakiety
+  const paks=gPak().filter(p=>p.modele.includes(w.model)&&(p.klasa==='both'||p.klasa===w.klasa));
+  document.getElementById('m-pakiety').innerHTML=paks.map(p=>`<button onclick="zastosujPakiet('${p.id}');closeById('m-mat');" style="background:var(--ob2);border:1px solid rgba(255,107,0,.3);border-radius:8px;padding:8px 12px;width:100%;text-align:left;cursor:pointer;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between;">
+    <div><div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;color:var(--orange);">${esc(p.nazwa)}</div><div style="font-size:11px;color:var(--silver2);">${p.produkty.length} produktów</div></div>
+    <span style="color:var(--orange);">+</span>
+  </button>`).join('')||`<div style="font-size:12px;color:var(--silver2);">Brak pakietów dla tego modelu/klasy</div>`;
+  // Magazyn
+  const mag=gMag();const dostawcy=[...new Set(mag.map(p=>p.dostawca))];
+  document.getElementById('m-mag-list').innerHTML=dostawcy.map(d=>{
+    const prod=mag.filter(p=>p.dostawca===d);
+    return`<div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:10px;color:var(--orange);letter-spacing:.08em;padding:4px 0 2px;">${d}</div>`+
+    prod.map(p=>{const sc=p.stan<=0?'var(--red)':p.stan<=5?'var(--gold)':'var(--silver2)';return`<div style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid var(--border);cursor:pointer;" onclick="pobierzProdukt('${p.id}')">
+      <div style="flex:1;"><div style="font-weight:600;font-size:12px;">${esc(p.nazwa)}</div><div style="font-size:10px;color:${sc};">Stan: ${p.stan} ${p.jed}${S.isAdmin?` · ${p.cena||0} zł`:''}</div></div>
+      <span style="color:var(--orange);font-size:16px;">+</span>
+    </div>`;}).join('');
+  }).join('');
+  document.getElementById('mat-name').value='';document.getElementById('mat-qty').value='';document.getElementById('mat-cost').value='';
+  document.querySelector('.mat-cost-fg').style.display=S.isAdmin?'block':'none';
+  showM('m-mat');
+}
+function pobierzProdukt(id){
+  const w=gWozek(S.detailId);if(!w)return;const mag=gMag();const prod=mag.find(p=>p.id===id);if(!prod)return;
+  const il=parseFloat(prompt(`Ile "${prod.nazwa}"?`,'1'));if(!il||il<=0)return;
+  const idx=mag.findIndex(p=>p.id===id);if(idx>=0){mag[idx].stan=Math.max(0,(mag[idx].stan||0)-il);sMag(mag);}
+  w.materials.push({id:`m_${Date.now()}`,produktId:id,name:prod.nazwa,qty:`${il} ${prod.jed}`,cost:prod.cena*il,workerId:S.wkId||null,ts:Date.now()});
+  w.updatedAt=Date.now();sWozek(w);closeById('m-mat');renderDetailBody(w);toast(`📦 ${prod.nazwa}×${il}`,'success');
+}
+function zastosujPakiet(pakId){
+  const w=gWozek(S.detailId);if(!w)return;const pak=gPak().find(p=>p.id===pakId);if(!pak)return;
+  const mag=gMag();
+  pak.produkty.forEach(pp=>{
+    const prod=mag.find(p=>p.id===pp.id);if(!prod)return;
+    const idx=mag.findIndex(p=>p.id===pp.id);if(idx>=0)mag[idx].stan=Math.max(0,(mag[idx].stan||0)-pp.il);
+    w.materials.push({id:`m_${Date.now()}_${Math.random().toString(36).slice(2,4)}`,produktId:pp.id,name:prod.nazwa,qty:`${pp.il} ${prod.jed}`,cost:prod.cena*pp.il,workerId:S.wkId||null,ts:Date.now()});
+  });
+  sMag(mag);w.updatedAt=Date.now();sWozek(w);renderDetailBody(w);toast(`📦 Pakiet: ${pak.nazwa}`,'success');
+}
+function saveManualMat(){
+  const name=document.getElementById('mat-name').value.trim();if(!name){toast('Podaj nazwę!','error');return;}
+  const w=gWozek(S.detailId);if(!w)return;
+  w.materials.push({id:`m_${Date.now()}`,name,qty:document.getElementById('mat-qty').value.trim(),cost:parseFloat(document.getElementById('mat-cost').value)||0,workerId:S.wkId||null,ts:Date.now()});
+  w.updatedAt=Date.now();sWozek(w);closeById('m-mat');renderDetailBody(w);toast('📦 Dodano','success');
+}
+function removeMat(i){
+  const w=gWozek(S.detailId);if(!w)return;
+  const mat=w.materials[i];
+  if(mat?.produktId){const mag=gMag();const p=mag.find(x=>x.id===mat.produktId);if(p){const il=parseFloat(mat.qty)||0;p.stan=(p.stan||0)+il;sMag(mag);}}
+  w.materials.splice(i,1);w.updatedAt=Date.now();sWozek(w);renderDetailBody(w);
+}
+function addWorkPhoto(input){
+  const file=input.files[0];if(!file)return;const w=gWozek(S.detailId);if(!w)return;
+  const r=new FileReader();r.onload=e=>{if(!w.workPhotos)w.workPhotos=[];w.workPhotos.push({src:e.target.result,ts:Date.now(),label:''});w.updatedAt=Date.now();sWozek(w);renderDetailBody(w);toast('📷 Dodano','success');};r.readAsDataURL(file);
+}
+// ══════════════════════════════════════════════
+// ADD / EDIT WÓZEK
+// ══════════════════════════════════════════════
+function openAddWozek(){
+  if(!S.isAdmin){toast('Tylko admin może dodawać wózki','error');return;}
+  ['a-vin','a-notatka'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('a-model').value='';
+  const custom=document.getElementById('a-model-custom');if(custom)custom.style.display='none';
+  document.getElementById('a-klasa').value='bronze';
+  document.getElementById('a-budowa').value='kabina';document.getElementById('a-bat').value='kwasowa';
+  document.getElementById('a-stan').value='plac';
+  document.getElementById('a-pilny').checked=false;document.getElementById('a-jezdny').checked=true;
+  document.getElementById('a-podnosi').checked=true;document.getElementById('a-karetka').checked=true;
+  // Reset VIN photo
+  document.getElementById('pv-p').style.display='none';document.getElementById('pv-w').classList.remove('ok');
+  // Reset wózek photos grid
+  document.getElementById('a-photos-grid').innerHTML='';
+  showM('m-add');
+}
+function saveNewWozek(){
+  const vin=document.getElementById('a-vin').value.trim().toUpperCase();if(!vin){toast('VIN wymagany!','error');return;}
+  const model=getModelValue('a-model','a-model-custom');if(!model||model==='__inny__'){toast('Wybierz lub wpisz model!','error');return;}
+  if(gWozki().find(w=>w.vin===vin)){toast('Ten VIN już istnieje!','error');return;}
+  const pv=document.getElementById('pv-p').src;
+  // Zbierz wszystkie zdjęcia wózka z gridu
+  const photoImgs=document.querySelectorAll('#a-photos-grid img.added-photo');
+  const wozekPhotos=[...photoImgs].map((img,i)=>({src:img.src,ts:Date.now()+i,label:`Przyjęcie ${i+1}`}));
+  const photoWozek=wozekPhotos.length?wozekPhotos[0].src:null;
+  const w=makeWozek({vin,model,klasa:document.getElementById('a-klasa').value,budowa:document.getElementById('a-budowa').value,bateria:document.getElementById('a-bat').value,stanLog:document.getElementById('a-stan').value,pilny:document.getElementById('a-pilny').checked,jezdny:document.getElementById('a-jezdny').checked,podnosi:document.getElementById('a-podnosi').checked,karetka:document.getElementById('a-karetka').checked,notatka:document.getElementById('a-notatka').value.trim(),photoWozek,photoVin:pv&&pv!=='data:,'?pv:null});
+  // Dodaj pozostałe zdjęcia do workPhotos
+  if(wozekPhotos.length>1){w.workPhotos=wozekPhotos.slice(1);}
+  sWozek(w);closeById('m-add');toast(`✓ Przyjęto: ${w.vin}`,'success');
+  setFilter('nowe');navTo('lista');
+}
+function openEditWozek(){
+  const w=gWozek(S.detailId);if(!w||!S.isAdmin)return;S.editId=w.id;
+  document.getElementById('e-vin').value=w.vin;
+  setModelValue('e-model','e-model-custom',w.model);
+  document.getElementById('e-klasa').value=w.klasa;document.getElementById('e-budowa').value=w.budowa||'kabina';
+  document.getElementById('e-bat').value=w.bateria||'kwasowa';document.getElementById('e-stan').value=w.stanLog||'plac';
+  document.getElementById('e-pilny').checked=!!w.pilny;document.getElementById('e-jezdny').checked=!!w.jezdny;
+  document.getElementById('e-podnosi').checked=!!w.podnosi;document.getElementById('e-karetka').checked=w.karetka!==false;
+  showM('m-edit');
+}
+function saveEditWozek(){
+  const w=gWozek(S.editId);if(!w)return;
+  const nm=getModelValue('e-model','e-model-custom');if(!nm||nm==='__inny__'){toast('Wybierz lub wpisz model!','error');return;}
+  const nk=document.getElementById('e-klasa').value;const mc=nm!==w.model||nk!==w.klasa;
+  w.model=nm;w.klasa=nk;w.budowa=document.getElementById('e-budowa').value;w.bateria=document.getElementById('e-bat').value;
+  w.stanLog=document.getElementById('e-stan').value;w.pilny=document.getElementById('e-pilny').checked;
+  w.jezdny=document.getElementById('e-jezdny').checked;w.podnosi=document.getElementById('e-podnosi').checked;
+  w.karetka=document.getElementById('e-karetka').checked;
+  if(mc){const tpl=gOps();w.operations=w.operations.map(op=>{const t=tpl.find(x=>x.id===op.id);return{...op,wymagana:t?isReq(t,w.model,w.klasa):op.wymagana};});w.progress=calcProg(w);}
+  w.updatedAt=Date.now();sWozek(w);closeById('m-edit');refreshDH(w);renderDetailBody(w);toast('💾 Zapisano','success');
+}
+function confirmDel(){
+  const w=gWozek(S.editId||S.detailId);if(!w)return;
+  openConfirm('🗑 Usuń wózek',`Na pewno usunąć ${w.vin} (${w.model})?`,'USUŃ TRWALE',()=>{
+    sWozki(gWozki().filter(x=>x.id!==w.id));closeById('m-edit');closeDetail();toast('🗑 Usunięto','info');
+  });
+}
+
+// ══════════════════════════════════════════════
+// ADMIN PANEL
+// ══════════════════════════════════════════════
+function renderAdmin(){
+  const {hourlyRate=75,ntfyChannel=''}=gSet();const workers=gWorkers();const all=gWozki();
+  const s=all.reduce((a,w)=>{a.t++;if(w.status==='nowe')a.n++;else if(w.status==='reanimacja')a.p++;else if(w.status==='skompletowane')a.d++;if(w.hasCrisis)a.c++;const secs=w.operations.reduce((t,o)=>t+(o.totalSecs||0),0);const mats=(w.materials||[]).reduce((t,m)=>t+(parseFloat(m.cost)||0),0);a.ts+=secs;a.m+=mats;a.l+=(secs/3600)*hourlyRate;return a;},{t:0,n:0,p:0,d:0,c:0,ts:0,m:0,l:0});
+
+  document.getElementById('admin-body').innerHTML=`
+  <div class="admin-sec">📊 PRZEGLĄD</div>
+  <div class="fin-grid" style="margin-bottom:6px;">
+    <div class="fin-card"><div class="fin-lbl">🚜 ŁĄCZNIE</div><div class="fin-val">${s.t}</div></div>
+    <div class="fin-card"><div class="fin-lbl">✅ GOTOWE</div><div class="fin-val" style="color:var(--green);">${s.d}</div></div>
+    <div class="fin-card"><div class="fin-lbl">⚙️ W PRACY</div><div class="fin-val" style="color:var(--orange);">${s.p}</div></div>
+    <div class="fin-card" style="${s.c?'border-color:var(--red);':''}"><div class="fin-lbl">🚨 KRYZYSY</div><div class="fin-val" style="color:var(--red);">${s.c}</div></div>
+  </div>
+  <div class="fin-grid" style="margin-bottom:6px;">
+    <div class="fin-card"><div class="fin-lbl">💪 ROBOCIZNA</div><div class="fin-val">${s.l.toFixed(0)} zł</div></div>
+    <div class="fin-card"><div class="fin-lbl">📦 MATERIAŁY</div><div class="fin-val">${s.m.toFixed(0)} zł</div></div>
+  </div>
+  <div class="fin-card" style="border-color:var(--orange);margin-bottom:12px;"><div class="fin-lbl">💰 ŁĄCZNE KOSZTY</div><div class="fin-val big">${(s.l+s.m).toFixed(2)} zł</div></div>
+
+  <div class="admin-sec">⚙️ STAWKA I USTAWIENIA</div>
+  <div class="fg"><label class="fl">Stawka godzinowa (zł/h)</label><input id="adm-stawka" class="fi" type="number" value="${hourlyRate}" min="1" step="0.5"></div>
+  <button class="btn bp" onclick="saveStawka()" style="margin-bottom:12px;">💾 ZAPISZ STAWKĘ</button>
+
+  <div class="admin-sec">👷 PRACOWNICY <button class="bgh bsm" onclick="openWorkerModal(null)">+ DODAJ</button></div>
+  ${workers.map(wk=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:9px;padding:10px 12px;display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+    <div style="width:34px;height:34px;border-radius:8px;background:${wColor(wk.id)};display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:14px;color:#fff;">${wk.initials}</div>
+    <div style="flex:1;min-width:0;"><div style="font-weight:600;font-size:13px;">${esc(wk.name)}</div>
+    <div style="font-size:11px;color:var(--silver2);">${((wk.role||[]).map(r=>ROLE_DEF.find(x=>x.id===r)?.name||r)).join(', ')||'Brak ról'}</div></div>
+    <button onclick="openWorkerModal('${wk.id}')" style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:5px 9px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:10px;color:var(--silver2);cursor:pointer;">✏️ EDYTUJ</button>
+  </div>`).join('')}
+
+  <div class="admin-sec" style="margin-top:12px;">📦 MAGAZYN
+    <div style="display:flex;gap:5px;">
+      <button class="bgh bsm" onclick="openAddProdukt()">+ PRODUKT</button>
+      <button class="bgh bsm" onclick="toggleSection('adm-mag')">▼</button>
+    </div>
+  </div>
+  <div id="adm-mag" style="display:none;max-height:280px;overflow-y:auto;margin-bottom:8px;">${renderAdmMag()}</div>
+
+  <div class="admin-sec">🎁 PAKIETY BAZOWE
+    <div style="display:flex;gap:5px;">
+      <button class="bgh bsm" onclick="openAddPakiet(null)">+ PAKIET</button>
+      <button class="bgh bsm" onclick="toggleSection('adm-pak')">▼</button>
+    </div>
+  </div>
+  <div id="adm-pak" style="display:none;margin-bottom:12px;">${renderAdmPak()}</div>
+
+  <div class="admin-sec">🔒 BEZPIECZEŃSTWO</div>
+  <div class="fg"><label class="fl">Nowy PIN admina (4 cyfry)</label><input id="adm-pin-new" class="fi" type="password" inputmode="numeric" maxlength="4" placeholder="••••" style="letter-spacing:.3em;font-size:20px;text-align:center;"></div>
+  <button class="btn bp" onclick="saveAdminPin()" style="margin-bottom:12px;">💾 ZMIEŃ PIN ADMINA</button>
+
+  <div class="admin-sec">🔔 POWIADOMIENIA (ntfy.sh)</div>
+  <div class="fg"><label class="fl">Kanał ntfy.sh</label><input id="adm-ntfy" class="fi" type="text" placeholder="np. hala-wozki-2024" value="${ntfyChannel}">
+  <div style="font-size:11px;color:var(--silver2);margin-top:3px;">Subskrybuj na ntfy.sh lub w aplikacji ntfy.</div></div>
+  <div style="display:flex;gap:8px;margin-bottom:16px;">
+    <button class="btn bs" style="flex:1;" onclick="saveNtfy()">💾 ZAPISZ</button>
+    <button class="btn bs" style="flex:1;" onclick="testNtfy()">🔔 TEST</button>
+  </div>
+
+  <div class="admin-sec">📊 RAPORTY</div>
+  <button class="btn bp" onclick="exportCSV()" style="margin-bottom:8px;">📊 EKSPORTUJ CSV</button>
+  <div class="admin-sec" style="margin-top:8px;border-color:var(--red);color:var(--red);">🗑 NIEBEZPIECZNA STREFA</div>
+  <button class="btn bd" onclick="clearAllWozki()" style="width:100%;margin-bottom:24px;">🗑 USUŃ WSZYSTKIE WÓZKI</button>
+  `;
+}
+
+function toggleSection(id){const el=document.getElementById(id);if(el)el.style.display=el.style.display==='none'?'block':'none';}
+function renderAdmMag(){
+  const mag=gMag();const dostawcy=[...new Set(mag.map(p=>p.dostawca))];
+  return dostawcy.map(d=>{const prod=mag.filter(p=>p.dostawca===d);
+    return`<div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:10px;color:var(--orange);letter-spacing:.08em;padding:4px 0 2px;">${d}</div>`+
+    prod.map(p=>{const c=p.stan<=0?'var(--red)':p.stan<=5?'var(--gold)':'var(--green)';
+      return`<div style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid var(--border);">
+        <div style="flex:1;min-width:0;"><div style="font-weight:600;font-size:12px;">${esc(p.nazwa)}</div><div style="font-size:10px;color:var(--silver2);">${p.indeks||'—'} · ${p.cena||0} zł/${p.jed}</div></div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:14px;color:${c};">${p.stan}</div>
+        <button onclick="editProd('${p.id}')" style="background:none;border:1px solid var(--border);border-radius:5px;padding:3px 6px;font-size:10px;color:var(--silver2);cursor:pointer;">✏️</button>
+      </div>`;}).join('');
+  }).join('');
+}
+function editProd(id){
+  const mag=gMag();const p=mag.find(x=>x.id===id);if(!p)return;
+  const ns=prompt(`Stan "${p.nazwa}" (${p.jed}):`,p.stan);if(ns===null)return;
+  const nc=prompt(`Cena (zł/${p.jed}):`,p.cena||0);if(nc===null)return;
+  p.stan=parseFloat(ns)||0;p.cena=parseFloat(nc)||0;sMag(mag);
+  const el=document.getElementById('adm-mag');if(el)el.innerHTML=renderAdmMag();
+  toast(`💾 ${p.nazwa}`,'success');
+}
+function renderAdmPak(){
+  const pak=gPak();const mag=gMag();
+  if(!pak.length)return`<div style="text-align:center;padding:16px;color:var(--silver2);font-size:13px;">Brak pakietów. Kliknij + PAKIET aby dodać.</div>`;
+  return pak.map(p=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:9px 11px;margin-bottom:4px;display:flex;align-items:flex-start;gap:8px;">
+    <div style="flex:1;min-width:0;">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;margin-bottom:2px;">${esc(p.nazwa)}</div>
+      <div style="font-size:11px;color:var(--silver2);margin-bottom:4px;">Modele: ${p.modele.join(', ')} · ${p.klasa}</div>
+      ${p.produkty.map(pp=>{const pr=mag.find(x=>x.id===pp.id);return`<div style="font-size:11px;color:var(--silver);">· ${pr?esc(pr.nazwa):'?'} ×${pp.il} ${pr?pr.jed:''}</div>`;}).join('')}
+    </div>
+    <button onclick="openAddPakiet('${p.id}')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:10px;color:var(--silver2);cursor:pointer;flex-shrink:0;">✏️</button>
+  </div>`).join('');
+}
+
+// Worker modal
+let _editWkId=null;
+function openWorkerModal(id){
+  _editWkId=id;const wk=id?gWorker(id):null;
+  const old=document.getElementById('wk-modal');if(old)old.remove();
+  const m=document.createElement('div');m.id='wk-modal';m.className='overlay';m.style.cssText='display:flex;z-index:600;';
+  const roles=ROLE_DEF.map(r=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);">
+    <span style="font-size:13px;">${r.name}</span>
+    <label class="toggle"><input type="checkbox" id="wr-${r.id}" ${wk&&(wk.role||[]).includes(r.id)?'checked':''}><span class="sl"></span></label>
+  </div>`).join('');
+  m.innerHTML=`<div class="sheet"><div class="sh"></div><div class="stitle">${wk?'✏️ Edytuj':'+ Nowy'} pracownik</div>
+    <div class="fg"><label class="fl">Imię i Nazwisko</label><input id="wke-name" class="fi" type="text" value="${wk?esc(wk.name):''}" placeholder="Jan Kowalski"></div>
+    <div class="fg"><label class="fl">Inicjały (2-3 litery)</label><input id="wke-init" class="fi" type="text" maxlength="3" value="${wk?wk.initials:''}" placeholder="JK" style="text-transform:uppercase;letter-spacing:.2em;text-align:center;font-size:18px;font-weight:700;"></div>
+    <div class="fg"><label class="fl">PIN (4 cyfry)</label><input id="wke-pin" class="fi" type="password" inputmode="numeric" maxlength="4" value="${wk?wk.pin||'':''}" placeholder="••••" style="letter-spacing:.3em;font-size:20px;text-align:center;"></div>
+    <div class="fg"><label class="fl">Role pracownika</label><div style="margin-top:4px;">${roles}</div></div>
+    <div class="row" style="margin-top:14px;">
+      ${wk?`<button class="btn bd bsm" onclick="deleteWk('${wk.id}')">🗑 USUŃ</button>`:''}
+      <button class="btn bs" onclick="document.getElementById('wk-modal').remove()">ANULUJ</button>
+      <button class="btn bp" style="flex:2;" onclick="saveWk()">💾 ZAPISZ</button>
+    </div>
+  </div>`;
+  document.body.appendChild(m);
+  document.getElementById('wke-name')?.addEventListener('input',function(){
+    document.getElementById('wke-init').value=this.value.trim().split(' ').map(p=>p[0]||'').join('').slice(0,3).toUpperCase();
+  });
+}
+function saveWk(){
+  const name=document.getElementById('wke-name').value.trim();if(!name){toast('Podaj imię!','error');return;}
+  let init=document.getElementById('wke-init').value.trim().toUpperCase();if(!init)init=name.split(' ').map(p=>p[0]).join('').slice(0,3).toUpperCase();
+  const pin=document.getElementById('wke-pin').value.trim();if(!pin||!/^\d{4}$/.test(pin)){toast('PIN musi mieć 4 cyfry!','error');return;}
+  const role=ROLE_DEF.map(r=>r.id).filter(id=>document.getElementById('wr-'+id)?.checked);
+  const workers=gWorkers();
+  if(_editWkId){const idx=workers.findIndex(w=>w.id===_editWkId);if(idx>=0)workers[idx]={...workers[idx],name,initials:init,pin,role};}
+  else workers.push({id:`w_${Date.now()}`,name,initials:init,pin,role,myWozki:[]});
+  sWorkers(workers);document.getElementById('wk-modal').remove();renderAdmin();toast('💾 Zapisano','success');
+}
+function deleteWk(id){
+  if(!confirm('Na pewno usunąć tego pracownika?'))return;
+  sWorkers(gWorkers().filter(w=>w.id!==id));document.getElementById('wk-modal').remove();renderAdmin();toast('🗑 Usunięto','info');
+}
+function saveStawka(){const v=parseFloat(document.getElementById('adm-stawka').value);if(!v||v<1){toast('Podaj stawkę!','error');return;}const s=gSet();s.hourlyRate=v;sSet(s);toast(`💾 Stawka: ${v} zł/h`,'success');}
+function saveAdminPin(){const p=document.getElementById('adm-pin-new').value.trim();if(!/^\d{4}$/.test(p)){toast('PIN 4 cyfry!','error');return;}const s=gSet();s.adminPin=p;sSet(s);sessionStorage.removeItem('nw8_admin');toast('🔑 PIN zmieniony — zaloguj się ponownie','success');}
+function saveNtfy(){const ch=document.getElementById('adm-ntfy').value.trim();const s=gSet();s.ntfyChannel=ch;sSet(s);toast(ch?`🔔 Kanał: ${ch}`:'Wyłączone','success');}
+function testNtfy(){const ch=gSet().ntfyChannel;if(!ch){toast('Podaj kanał!','error');return;}fetch(`https://ntfy.sh/${ch}`,{method:'POST',headers:{'Title':'Nasze Wózki TEST','Tags':'white_check_mark'},body:'✅ Powiadomienia działają!'}).then(()=>toast('🔔 Test wysłany','success')).catch(()=>toast('Błąd — sprawdź kanał','error'));}
+
+// ══════════════════════════════════════════════
+// PRINT & CSV
+// ══════════════════════════════════════════════
+function printWozek(){
+  const w=gWozek(S.detailId);if(!w)return;
+  const {hourlyRate=75}=gSet();const workers=gWorkers();
+  const req=w.operations.filter(o=>o.wymagana!==false);
+  const secs=req.reduce((s,o)=>s+(o.totalSecs||0),0);
+  const mats=(w.materials||[]).reduce((s,m)=>s+(parseFloat(m.cost)||0),0);
+  const l=(secs/3600)*hourlyRate;const etap=getEtap(w);
+  const win=window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html lang="pl"><head><meta charset="UTF-8"><title>Karta — ${w.vin}</title>
+  <style>body{font-family:Arial,sans-serif;font-size:12px;color:#000;margin:0;padding:16px;}
+  h1{font-size:22px;color:#FF6B00;margin:0 0 4px;}
+  .sub{font-size:11px;color:#666;margin-bottom:14px;}
+  table{width:100%;border-collapse:collapse;margin-bottom:12px;}
+  th{background:#FF6B00;color:#fff;padding:5px 8px;text-align:left;font-size:11px;}
+  td{padding:4px 8px;border-bottom:1px solid #eee;font-size:11px;}
+  tr.done td{color:#22c55e;}
+  .total{background:#fff3e0;border:2px solid #FF6B00;border-radius:6px;padding:12px 14px;margin-top:10px;}
+  .tv{font-size:24px;font-weight:bold;color:#FF6B00;}
+  @media print{@page{margin:10mm;}}</style></head><body>
+  <h1>${esc(w.vin)} — ${esc(w.model)}</h1>
+  <div class="sub">Karta renowacji · ${new Date().toLocaleString('pl-PL')} · Etap: ${etap.name} · Postęp: ${w.progress}% · ${w.klasa==='silver'?'Srebro':'Brąz'}</div>
+  <table><tr><th>#</th><th>Operacja</th><th>Status</th><th>Czas</th><th>Pracownicy</th></tr>
+  ${req.map((op,i)=>`<tr class="${op.status==='done'?'done':''}"><td>${i+1}</td><td>${esc(op.name)}</td><td>${op.status}</td><td>${fmtT(op.totalSecs||0)}</td><td>${op.workers.map(wk=>{const x=workers.find(y=>y.id===wk.workerId);return x?x.initials:'?';}).join(', ')||'—'}</td></tr>`).join('')}
+  </table>
+  ${(w.materials||[]).length?`<table><tr><th>Materiał</th><th>Ilość</th></tr>${(w.materials||[]).map(m=>`<tr><td>${esc(m.name)}</td><td>${esc(m.qty||'')}</td></tr>`).join('')}</table>`:''}
+  ${(w.notes||[]).length?`<div style="margin-bottom:12px;"><strong>Notatki:</strong><ul>${(w.notes||[]).map(n=>`<li>${esc(n.text)}</li>`).join('')}</ul></div>`:''}
+  <div class="total"><div style="font-size:11px;text-transform:uppercase;color:#888;font-weight:bold;margin-bottom:4px;">Całkowity koszt renowacji</div><div class="tv">${(l+mats).toFixed(2)} zł</div><div style="font-size:11px;color:#666;margin-top:3px;">Robocizna: ${l.toFixed(0)} zł (${(secs/3600).toFixed(1)}h) · Materiały: ${mats.toFixed(0)} zł</div></div>
+  <script>window.print();window.close();<\/script></body></html>`);
+  win.document.close();
+}
+function exportCSV(){
+  const {hourlyRate=75}=gSet();
+  const rows=[['VIN','Model','Klasa','Status','Etap','Postęp %','Godziny','Robocizna zł','Materiały zł','Łącznie zł','Kryzysy','Przyjęto']];
+  gWozki().forEach(w=>{const secs=w.operations.reduce((t,o)=>t+(o.totalSecs||0),0);const m=(w.materials||[]).reduce((t,x)=>t+(parseFloat(x.cost)||0),0);const l=(secs/3600)*hourlyRate;const etap=getEtap(w);rows.push([w.vin,w.model,w.klasa==='silver'?'Srebro':'Brąz',w.status,etap.name,w.progress,(secs/3600).toFixed(2),l.toFixed(2),m.toFixed(2),(l+m).toFixed(2),(w.crisisLogs||[]).length,new Date(w.createdAt).toLocaleDateString('pl-PL')]);});
+  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\r\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));a.download=`nw-${new Date().toISOString().slice(0,10)}.csv`;document.body.appendChild(a);a.click();document.body.removeChild(a);toast('📊 CSV pobrany','success');
+}
+
+// ══════════════════════════════════════════════
+// SWIPE BACK
+// ══════════════════════════════════════════════
+function initSwipe(){
+  const el=document.getElementById('screen-detail');let sx=0,sy=0,on=false;
+  el.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;on=sx<36;},{passive:true});
+  el.addEventListener('touchmove',e=>{if(!on)return;const dx=e.touches[0].clientX-sx,dy=Math.abs(e.touches[0].clientY-sy);if(dy>30&&dx<8){on=false;return;}if(dx>0){el.style.transform=`translateX(${Math.min(dx*.85,window.innerWidth*.7)}px)`;el.classList.add('swiping');}},{passive:true});
+  el.addEventListener('touchend',e=>{if(!on)return;on=false;el.classList.remove('swiping');const dx=e.changedTouches[0].clientX-sx;if(dx>90){el.style.transition='transform .22s ease';el.style.transform='translateX(100%)';setTimeout(()=>{el.style.transition='';el.style.transform='';el.classList.remove('open');closeDetail();},230);}else{el.style.transition='transform .18s ease';el.style.transform='';setTimeout(()=>{el.style.transition='';},200);}},{passive:true});
+}
+
+// ══════════════════════════════════════════════
+// TICK
+// ══════════════════════════════════════════════
+function tick(){
+  const n=countActive();const b=document.getElementById('active-pill');
+  if(n>0){b.style.display='flex';document.getElementById('active-cnt').textContent=n;}
+  else b.style.display='none';
+  // Update timers in moje view
+  document.querySelectorAll('[data-timer]').forEach(el=>{
+    const opId=el.dataset.timer,wId=el.dataset.wid;if(!wId)return;
+    const wz=gWozek(wId);if(!wz)return;
+    const op=wz.operations.find(o=>o.id===opId);
+    if(op&&op.status==='in-progress')el.textContent=fmtT(liveSecs(op));
+  });
+}
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+// ── MIGRACJA OPERACJI ─────────────────────────
+// Aktualizuje operacje istniejących wózków do aktualnego szablonu DEF_OPS.
+// Zachowuje postęp (status, workers, totalSecs, completedAt) dla operacji
+// które istniały wcześniej i nadal istnieją (te same id).
+// Operacje których już nie ma w szablonie — usuwa.
+// Nowe operacje ze szablonu — dodaje jako idle.
+const OPS_VER='v83';
+const OPS_MIGRATION_KEY='nw8_ops_migrated_v83';
+function migrateWozkiOps(){
+  if(localStorage.getItem(OPS_MIGRATION_KEY))return;
+  _doMigrateOps();
+  localStorage.setItem(OPS_MIGRATION_KEY,'1');
+}
+// Uruchamiana też po załadowaniu danych z Firebase
+function _doMigrateOps(){
+  const wozki=gWozki();if(!wozki.length)return;
+  const tpl=DEF_OPS;let changed=false;
+  wozki.forEach((w,wi)=>{
+    // Sprawdź czy operacje są aktualne — wersja lub niezgodność nazw
+    const needsMig=!w._opsVer||w._opsVer!==OPS_VER||w.operations.length!==tpl.length||
+      w.operations.some((op,i)=>tpl[i]&&op.name!==tpl[i].name);
+    if(!needsMig)return;
+    const oldMap={};w.operations.forEach(o=>{oldMap[o.id]=o;});
+    wozki[wi].operations=tpl.map(t=>{
+      const old=oldMap[t.id];
+      if(old)return{...old,name:t.name,group:t.group,skip:t.skip||null,wymagana:isReq(t,w.model,w.klasa)};
+      return{id:t.id,name:t.name,group:t.group,skip:t.skip||null,wymagana:isReq(t,w.model,w.klasa),status:'idle',workers:[],totalSecs:0,completedAt:null,startedAt:null};
+    });
+    wozki[wi]._opsVer=OPS_VER;
+    wozki[wi].progress=calcProg(wozki[wi]);
+    changed=true;
+  });
+  if(changed){sWozki(wozki);console.log('%c✓ Migracja operacji OK','color:#22C55E;font-weight:bold;');}
+  fixWozkiStatuses();
+}
+
+// Sprawdza i naprawia statusy wszystkich wózków przy każdym starcie
+function fixWozkiStatuses(){
+  const wozki=gWozki();let changed=false;
+  wozki.forEach((w,i)=>{
+    const prog=calcProg(w);
+    wozki[i].progress=prog;
+    // 100% i nie archiwum → skompletowane
+    if(prog===100&&w.status==='reanimacja'){
+      wozki[i].status='skompletowane';changed=true;
+    }
+    // Ma jakiekolwiek operacje in-progress/done ale status nowe → reanimacja
+    const hasWork=w.operations.some(o=>o.status==='done'||o.status==='in-progress'||o.status==='paused');
+    if(hasWork&&w.status==='nowe'){wozki[i].status='reanimacja';changed=true;}
+  });
+  if(changed)sWozki(wozki);
+}
+
+function init(){
+  // Zawsze wyczyść wózki z LocalStorage przy starcie
+  // Firebase jest jedynym źródłem prawdy dla wózków
+  localStorage.removeItem(LS.W);
+  localStorage.removeItem(LS.OPS);
+  localStorage.removeItem(OPS_MIGRATION_KEY);
+
+  // Seed defaults jeśli puste
+  if(!localStorage.getItem(LS.WK))  lsS(LS.WK,DEF_WORKERS);
+  if(!localStorage.getItem(LS.SET)) lsS(LS.SET,DEF_SET);
+  if(!localStorage.getItem(LS.MAG)) lsS(LS.MAG,DEF_MAG);
+  if(!localStorage.getItem(LS.PAK)) lsS(LS.PAK,DEF_PAK);
+
+  // Migracja pracowników
+  const ws=gWorkers();let mig=false;
+  ws.forEach((w,i)=>{
+    if(!w.pin){ws[i].pin=String(i+1).padStart(4,String(i+1));mig=true;}
+    if(!w.myWozki){ws[i].myWozki=[];mig=true;}
+    if(!w.role){ws[i].role=[];mig=true;}
+  });
+  if(mig)sWorkers(ws);
+
+  // Serial bar
+  const serialBar=document.createElement('div');
+  serialBar.id='serial-bar';serialBar.className='serial-bar';
+  serialBar.innerHTML=`<div class="serial-info">Zaznaczono: <strong id="serial-count">0</strong> operacji</div>
+    <div class="serial-bar-inner">
+      <button class="btn" style="flex:1;background:var(--orange);color:#000;" onclick="startSerial()">▶ STARTUJ WSZYSTKIE</button>
+      <button class="btn" style="flex:1;background:var(--green);color:#000;" onclick="stopSerial()">✓ ZAKOŃCZ WSZYSTKIE</button>
+      <button class="btn bs bsm" onclick="toggleSerialMode()">✕</button>
+    </div>`;
+  document.getElementById('view-moje').appendChild(serialBar);
+
+  // Restore session
+  const sadm=sessionStorage.getItem('nw8_admin');
+  const swk=sessionStorage.getItem('nw8_worker');
+  if(sadm){
+    S.isAdmin=true;S.wkId=null;
+    enterApp(null,true);
+  }else if(swk&&gWorkers().find(w=>w.id===swk)){
+    S.wkId=swk;S.isAdmin=false;
+    enterApp(gWorker(swk),false);
+  }else{
+    showLogin();
+  }
+
+  S.tickId=setInterval(tick,1000);
+  initSwipe();
+  // Firebase ładuje dane i odświeża widok
+  initFirebase();
+
+  document.getElementById('a-vin')?.addEventListener('input',function(){this.value=this.value.toUpperCase();});
+  console.log(`%c🚜 NASZE WÓZKI MES v${VER} — GOTOWE`,'color:#FF6B00;font-weight:bold;font-size:14px;');
+}
+
+// ══════════════════════════════════════════════
+// MODEL SELECT — obsługa "Inny model"
+// ══════════════════════════════════════════════
+function checkCustomModel(selId,inputId){
+  const sel=document.getElementById(selId);const inp=document.getElementById(inputId);if(!sel||!inp)return;
+  if(sel.value==='__inny__'){inp.style.display='block';inp.focus();}
+  else inp.style.display='none';
+}
+function getModelValue(selId,inputId){
+  const sel=document.getElementById(selId);const inp=document.getElementById(inputId);
+  if(!sel)return'';
+  if(sel.value==='__inny__')return(inp?.value||'').trim();
+  return sel.value;
+}
+function setModelValue(selId,inputId,val){
+  const sel=document.getElementById(selId);const inp=document.getElementById(inputId);if(!sel)return;
+  // Sprawdź czy jest na liście
+  let found=false;
+  for(const opt of sel.options){if(opt.value===val&&val!=='__inny__'){sel.value=val;found=true;break;}}
+  if(!found&&val){sel.value='__inny__';if(inp){inp.style.display='block';inp.value=val;}}
+  else if(inp)inp.style.display='none';
+}
+
+// ══════════════════════════════════════════════
+// VIN SKANER
+// ══════════════════════════════════════════════
+function scanVIN(){document.getElementById('vin-scan-input').click();}
+function handleVINScan(input){
+  const file=input.files[0];if(!file)return;
+  // Odczytaj zdjęcie i wyciągnij VIN z nazwy pliku lub daj prompt
+  const r=new FileReader();
+  r.onload=e=>{
+    // Próbuj odczytać VIN z obrazka przez Canvas OCR — uproszczone
+    // Pokazujemy podgląd i prosimy o potwierdzenie
+    const img=new Image();
+    img.onload=()=>{
+      const canvas=document.createElement('canvas');canvas.width=img.width;canvas.height=img.height;
+      const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0);
+      // Bez prawdziwego OCR — pokazujemy zdjęcie i prompt
+      toast('📷 Zdjęcie VIN wgrane — wpisz VIN z tabliczki','info');
+      // Zapisz jako foto VIN
+      document.getElementById('pv-p').src=e.target.result;
+      document.getElementById('pv-p').style.display='block';
+      document.getElementById('pv-w').classList.add('ok');
+      // Focus na pole VIN
+      document.getElementById('a-vin').focus();
+    };
+    img.src=e.target.result;
+  };
+  r.readAsDataURL(file);
+  input.value='';
+}
+
+// ══════════════════════════════════════════════
+// LIGHTBOX (powiększenie zdjęć)
+// ══════════════════════════════════════════════
+function openLightbox(src,label){
+  const lb=document.getElementById('lightbox')||createLightbox();
+  document.getElementById('lb-img').src=src;
+  document.getElementById('lb-lbl').textContent=label||'';
+  lb.style.display='flex';
+}
+function createLightbox(){
+  const lb=document.createElement('div');lb.id='lightbox';
+  lb.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:9000;display:flex;flex-direction:column;align-items:center;justify-content:center;';
+  lb.innerHTML=`<button onclick="document.getElementById('lightbox').style.display='none'" style="position:absolute;top:12px;right:12px;background:rgba(255,255,255,.15);border:none;border-radius:50%;width:38px;height:38px;font-size:20px;color:#fff;cursor:pointer;">✕</button>
+    <img id="lb-img" style="max-width:100%;max-height:85dvh;object-fit:contain;border-radius:6px;">
+    <div id="lb-lbl" style="color:rgba(255,255,255,.6);font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:13px;margin-top:10px;"></div>`;
+  lb.addEventListener('click',e=>{if(e.target===lb)lb.style.display='none';});
+  document.body.appendChild(lb);return lb;
+}
+
+// ══════════════════════════════════════════════
+// CRUD MAGAZYN
+// ══════════════════════════════════════════════
+function openAddProdukt(){
+  const old=document.getElementById('m-prod-modal');if(old)old.remove();
+  const m=document.createElement('div');m.id='m-prod-modal';m.className='overlay';m.style.cssText='display:flex;z-index:700;';
+  const dostawcy=[...new Set(gMag().map(p=>p.dostawca))];
+  const dostawcyOpts=dostawcy.map(d=>`<option>${d}</option>`).join('');
+  m.innerHTML=`<div class="sheet"><div class="sh"></div><div class="stitle">📦 NOWY PRODUKT</div>
+    <div class="fg"><label class="fl">Nazwa *</label><input id="prod-nazwa" class="fi" type="text" placeholder="np. Farba srebrna"></div>
+    <div class="fg"><label class="fl">Indeks / Kod</label><input id="prod-indeks" class="fi" type="text" placeholder="np. 9006"></div>
+    <div class="fg"><label class="fl">Dostawca *</label>
+      <select id="prod-dostawca" class="fi" onchange="checkCustomDostawca()">
+        ${dostawcyOpts}<option value="__nowy__">✏️ Nowy dostawca...</option>
+      </select>
+      <input id="prod-dostawca-custom" class="fi" type="text" placeholder="Nazwa dostawcy" style="display:none;margin-top:6px;">
+    </div>
+    <div class="g2">
+      <div class="fg"><label class="fl">Jednostka</label><select id="prod-jed" class="fi"><option>szt</option><option>L</option><option>kg</option><option>m</option><option>kpl</option></select></div>
+      <div class="fg"><label class="fl">Cena (zł)</label><input id="prod-cena" class="fi" type="number" min="0" step="0.01" placeholder="0.00"></div>
+    </div>
+    <div class="fg"><label class="fl">Stan początkowy</label><input id="prod-stan" class="fi" type="number" min="0" step="0.5" placeholder="0"></div>
+    <div class="row" style="margin-top:12px;">
+      <button class="btn bs" onclick="document.getElementById('m-prod-modal').remove()">ANULUJ</button>
+      <button class="btn bp" style="flex:2;" onclick="saveProdAdmin()">✓ DODAJ PRODUKT</button>
+    </div>
+  </div>`;
+  document.body.appendChild(m);
+}
+function checkCustomDostawca(){
+  const sel=document.getElementById('prod-dostawca');const inp=document.getElementById('prod-dostawca-custom');
+  if(!sel||!inp)return;inp.style.display=sel.value==='__nowy__'?'block':'none';
+  if(sel.value==='__nowy__')inp.focus();
+}
+function saveProdAdmin(){
+  const nazwa=document.getElementById('prod-nazwa').value.trim();if(!nazwa){toast('Podaj nazwę!','error');return;}
+  const sel=document.getElementById('prod-dostawca');const inp=document.getElementById('prod-dostawca-custom');
+  const dostawca=sel.value==='__nowy__'?(inp?.value||'').trim().toUpperCase():sel.value;
+  if(!dostawca){toast('Podaj dostawcę!','error');return;}
+  const mag=gMag();
+  mag.push({
+    id:`m_usr_${Date.now()}`,
+    nazwa,
+    indeks:document.getElementById('prod-indeks').value.trim(),
+    dostawca,
+    jed:document.getElementById('prod-jed').value,
+    cena:parseFloat(document.getElementById('prod-cena').value)||0,
+    stan:parseFloat(document.getElementById('prod-stan').value)||0,
+  });
+  sMag(mag);document.getElementById('m-prod-modal').remove();
+  // Odśwież widok magazynu
+  const el=document.getElementById('adm-mag');if(el&&el.style.display!=='none')el.innerHTML=renderAdmMag();
+  toast(`📦 Dodano: ${nazwa}`,'success');
+}
+
+// ══════════════════════════════════════════════
+// CRUD PAKIETY
+// ══════════════════════════════════════════════
+function openAddPakiet(editId){
+  const old=document.getElementById('m-pak-modal');if(old)old.remove();
+  const pak=editId?gPak().find(p=>p.id===editId):null;
+  const mag=gMag();const dostawcy=[...new Set(mag.map(p=>p.dostawca))];
+  const modeleList=['RX 20','RX 50','RX 60','RX 70','EGB','EGV','EXU-S','EXV','EXV-SF','FM 14','FM 20','FM-X','MX-X','RCE'];
+
+  const m=document.createElement('div');m.id='m-pak-modal';m.className='overlay';m.style.cssText='display:flex;z-index:700;';
+  m.innerHTML=`<div class="sheet"><div class="sh"></div><div class="stitle">${pak?'✏️ Edytuj':'+ Nowy'} pakiet bazowy</div>
+    <div class="fg"><label class="fl">Nazwa pakietu *</label><input id="pak-nazwa" class="fi" type="text" value="${pak?esc(pak.nazwa):''}" placeholder="np. Pakiet Srebro RX"></div>
+    <div class="fg"><label class="fl">Klasa</label><select id="pak-klasa" class="fi">
+      <option value="silver" ${pak?.klasa==='silver'?'selected':''}>🥈 Srebro</option>
+      <option value="bronze" ${pak?.klasa==='bronze'?'selected':''}>🥉 Brąz</option>
+      <option value="both"   ${pak?.klasa==='both'?'selected':''}>Oba</option>
+    </select></div>
+    <div class="fg"><label class="fl">Modele (zaznacz)</label>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:4px;">
+        ${modeleList.map(mo=>`<label style="display:flex;align-items:center;gap:4px;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;font-size:12px;font-family:'Barlow Condensed',sans-serif;font-weight:700;">
+          <input type="checkbox" value="${mo}" name="pak-model" ${pak&&pak.modele.includes(mo)?'checked':''} style="accent-color:var(--orange);">${mo}
+        </label>`).join('')}
+      </div>
+    </div>
+    <div class="fg"><label class="fl">Produkty</label>
+      <div id="pak-produkty-list" style="display:flex;flex-direction:column;gap:4px;margin-bottom:8px;">
+        ${pak?pak.produkty.map((pp,i)=>{const pr=mag.find(x=>x.id===pp.id);return`<div style="display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border);border-radius:7px;padding:6px 8px;" id="pakp-${i}"><span style="flex:1;font-size:12px;">${pr?esc(pr.nazwa):'?'}</span><input type="number" value="${pp.il}" min="0.1" step="0.5" style="width:52px;background:var(--panel);border:1px solid var(--border);border-radius:5px;color:#fff;padding:3px 5px;font-size:12px;" data-pid="${pp.id}"><button onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--silver2);cursor:pointer;font-size:14px;">✕</button></div>`;}).join(''):''}
+      </div>
+      <select id="pak-add-prod" class="fi" style="margin-bottom:6px;">
+        <option value="">— Wybierz produkt do dodania —</option>
+        ${dostawcy.map(d=>`<optgroup label="${d}">${mag.filter(p=>p.dostawca===d).map(p=>`<option value="${p.id}">${esc(p.nazwa)} (${p.jed})</option>`).join('')}</optgroup>`).join('')}
+      </select>
+      <div class="g2">
+        <input id="pak-add-il" class="fi" type="number" min="0.1" step="0.5" placeholder="Ilość" value="1">
+        <button class="btn bs" onclick="addProdToPakiet()">+ DODAJ</button>
+      </div>
+    </div>
+    <div class="row" style="margin-top:12px;">
+      ${pak?`<button class="btn bd bsm" onclick="deletePakiet('${pak.id}')">🗑</button>`:''}
+      <button class="btn bs" onclick="document.getElementById('m-pak-modal').remove()">ANULUJ</button>
+      <button class="btn bp" style="flex:2;" onclick="savePakiet('${editId||''}')">💾 ZAPISZ PAKIET</button>
+    </div>
+  </div>`;
+  document.body.appendChild(m);
+}
+function addProdToPakiet(){
+  const sel=document.getElementById('pak-add-prod');const il=parseFloat(document.getElementById('pak-add-il').value)||1;
+  if(!sel.value)return;const mag=gMag();const prod=mag.find(p=>p.id===sel.value);if(!prod)return;
+  const list=document.getElementById('pak-produkty-list');const idx=list.children.length;
+  const div=document.createElement('div');div.style.cssText='display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border);border-radius:7px;padding:6px 8px;';
+  div.innerHTML=`<span style="flex:1;font-size:12px;">${esc(prod.nazwa)}</span><input type="number" value="${il}" min="0.1" step="0.5" style="width:52px;background:var(--panel);border:1px solid var(--border);border-radius:5px;color:#fff;padding:3px 5px;font-size:12px;" data-pid="${prod.id}"><button onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--silver2);cursor:pointer;font-size:14px;">✕</button>`;
+  list.appendChild(div);sel.value='';
+}
+function savePakiet(editId){
+  const nazwa=document.getElementById('pak-nazwa').value.trim();if(!nazwa){toast('Podaj nazwę!','error');return;}
+  const klasa=document.getElementById('pak-klasa').value;
+  const modele=[...document.querySelectorAll('input[name="pak-model"]:checked')].map(x=>x.value);
+  if(!modele.length){toast('Zaznacz przynajmniej jeden model!','error');return;}
+  const produkty=[...document.getElementById('pak-produkty-list').querySelectorAll('input[data-pid]')].map(inp=>({id:inp.dataset.pid,il:parseFloat(inp.value)||1})).filter(pp=>pp.id);
+  const paki=gPak();
+  if(editId){const idx=paki.findIndex(p=>p.id===editId);if(idx>=0)paki[idx]={...paki[idx],nazwa,klasa,modele,produkty};}
+  else paki.push({id:`pak_${Date.now()}`,nazwa,klasa,modele,produkty});
+  sPak(paki);document.getElementById('m-pak-modal').remove();
+  const el=document.getElementById('adm-pak');if(el&&el.style.display!=='none')el.innerHTML=renderAdmPak();
+  toast(`🎁 Pakiet zapisany: ${nazwa}`,'success');
+}
+function deletePakiet(id){
+  if(!confirm('Usunąć ten pakiet?'))return;
+  sPak(gPak().filter(p=>p.id!==id));document.getElementById('m-pak-modal').remove();
+  const el=document.getElementById('adm-pak');if(el)el.innerHTML=renderAdmPak();
+  toast('🗑 Pakiet usunięty','info');
+}
+
+// ── MULTI-PHOTO SLOT (formularz przyjęcia) ────
+function addPhotoSlot(){
+  const grid=document.getElementById('a-photos-grid');if(!grid)return;
+  const idx=grid.querySelectorAll('.photo-slot-item').length;
+  const div=document.createElement('div');
+  div.className='photo-slot-item';
+  div.style.cssText='position:relative;aspect-ratio:4/3;border-radius:8px;border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--silver2);font-family:Barlow Condensed,sans-serif;font-weight:600;font-size:11px;overflow:hidden;background:var(--card);';
+  div.innerHTML=`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="6" width="20" height="14" rx="2"/><circle cx="12" cy="13" r="3"/><path d="M8 6l2-3h4l2 3"/></svg><span>Zdjęcie ${idx+1}</span><input type="file" accept="image/*" style="position:absolute;inset:0;opacity:0;cursor:pointer;" onchange="handlePhotoSlot(this,${idx})">`;
+  grid.appendChild(div);
+}
+function handlePhotoSlot(input,idx){
+  const file=input.files[0];if(!file)return;
+  const r=new FileReader();r.onload=e=>{
+    const slot=input.parentElement;
+    slot.style.borderStyle='solid';slot.style.borderColor='var(--green)';
+    // Usuń stary podgląd
+    slot.querySelectorAll('img.added-photo,svg,span').forEach(el=>el.remove());
+    // Dodaj podgląd
+    const img=document.createElement('img');
+    img.className='added-photo';
+    img.src=e.target.result;
+    img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;';
+    slot.insertBefore(img,input);
+    // Przycisk usuń
+    const del=document.createElement('button');
+    del.textContent='✕';del.type='button';
+    del.style.cssText='position:absolute;top:4px;right:4px;background:rgba(0,0,0,.6);border:none;border-radius:50%;width:22px;height:22px;color:#fff;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;';
+    del.onclick=()=>slot.remove();
+    slot.appendChild(del);
+  };r.readAsDataURL(file);
+}
+
+document.addEventListener('DOMContentLoaded',init);
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}
+</script>
+</body>
+</html>
